@@ -34,7 +34,6 @@ def polygon_to_mask(poly, image_size):
 
 
 def get_gt_csv(args, aoi):
-    # get pre image id from gt csv
     gt_csv_path = glob(os.path.join(args.train_dir, aoi, '*_reference.csv'))
     assert len(gt_csv_path) == 1, gt_csv_path
     return gt_csv_path[0]
