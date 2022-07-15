@@ -6,7 +6,6 @@ from multiprocessing.pool import Pool
 
 import pandas as pd
 from osgeo import gdal
-from requests import post
 from skimage import io
 from tqdm import tqdm
 
