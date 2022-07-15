@@ -108,7 +108,6 @@ def main():
     for aoi in aois:
         print(f'preparing road masks of {aoi} AOI')
         prepare_road_masks(args, aoi)
-    
 
 
 if __name__ == '__main__':
