@@ -9,3 +9,9 @@ osmnx==1.1.2
 statsmodels==0.13.2
 geopandas==0.10.2
 imagecodecs==2022.2.22
+opencv-python-headless==4.2.0.34
+albumentations==1.2.1
+python-dotenv==0.20.0
+omegaconf==2.2.2
+pytorch-lightning==1.6.5
+wandb==0.12.21
