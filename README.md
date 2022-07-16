@@ -1,17 +1,14 @@
 # spacenet8_solution
 
-## data preparation
+## data preprocess
 
 ```
-python tools/make_folds.py
-python tools/prepare_building_masks.py
-python tools/prepare_road_masks.py
-python tools/warp_post_images.py
-python tools/warp_post_images.py --root_dir /data/test/ --out_dir /wdata/test_warped/
+./scripts/preprocess.sh
 ```
 
-optional:
+## train foundation models
+
 ```
-python tools/visualize_dataset.py
-python tools/visualize_dataset.py --root_dir /data/test/ --test
+echo "WANDB_API_KEY = {YOUR_WANDB_API_KEY}" > .env
+python tools/train_net.py --type building
 ```
