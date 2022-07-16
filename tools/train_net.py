@@ -71,7 +71,7 @@ def main() -> None:
         filename='best',
         save_weights_only=False,
         save_top_k=1,
-        monitor='val/iou_imagewise',
+        monitor='val/iou',
         mode='max',
         save_last=True)
     callbacks = [checkpoint_callback]
