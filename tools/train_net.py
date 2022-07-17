@@ -4,7 +4,7 @@ import shutil
 
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Trainer, seed_everything
-from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 
 # isort: off
@@ -18,7 +18,7 @@ from spacenet8_model.utils.wandb import get_wandb_logger
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--type',
+        '--task',
         choices=['building', 'road', 'flood'],
         required=True
     )
@@ -38,12 +38,12 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def get_default_cfg_path(model_type: str) -> str:
-    if model_type == 'building':
+def get_default_cfg_path(task: str) -> str:
+    if task == 'building':
         return 'configs/defaults/foundation_building.yaml'
-    elif model_type == 'road':
+    elif task == 'road':
         raise NotImplementedError()
-    elif model_type == 'flood':
+    elif task == 'flood':
         raise NotImplementedError()
     else:
         raise ValueError()
@@ -52,8 +52,13 @@ def get_default_cfg_path(model_type: str) -> str:
 def main() -> None:
     args = parse_args()
 
-    default_cfg_path: str = get_default_cfg_path(args.type)
-    config: DictConfig = load_config(default_cfg_path, args.config, update_dotlist=args.opts)
+    default_cfg_path: str = get_default_cfg_path(args.task)
+    config: DictConfig = load_config(
+        default_cfg_path,
+        args.config,
+        update_dotlist=args.opts,
+        update_dict={'task': args.task}
+    )
 
     seed_everything(config.General.seed)
 
@@ -71,10 +76,11 @@ def main() -> None:
         filename='best',
         save_weights_only=False,
         save_top_k=1,
-        monitor='val/iou',
+        monitor=f'fold_{config.Data.fold_id}/val/iou',
         mode='max',
         save_last=True)
-    callbacks = [checkpoint_callback]
+    lr_monitor_callback = LearningRateMonitor(logging_interval='epoch')
+    callbacks = [checkpoint_callback, lr_monitor_callback]
 
     loggers = [TensorBoardLogger(output_dir, name=None)]
     if (not args.debug) and (not args.disable_wandb):
@@ -92,8 +98,8 @@ def main() -> None:
         auto_select_gpus=False,
         default_root_dir=os.getcwd(),
         gpus=config.General.gpus,
-        limit_train_batches=0.03 if args.debug else 1.0,
-        limit_val_batches=0.1 if args.debug else 1.0,
+        limit_train_batches=2 if args.debug else 1.0,
+        limit_val_batches=2 if args.debug else 1.0,
     )
 
     model = get_model(config)

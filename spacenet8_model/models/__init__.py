@@ -1,7 +1,13 @@
+from collections import defaultdict
+
 import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
 import torch
 from omegaconf import DictConfig
+
+# isort: off
+from spacenet8_model.models.losses import CombinedLoss
+# isort: on
 
 
 def get_model(config: DictConfig) -> torch.nn.Module:
@@ -30,9 +36,8 @@ class Model(pl.LightningModule):
         self.register_buffer('mean',
                              torch.tensor(params['mean']).view(1, 3, 1, 1))
 
-        # TODO: configure loss functions from config
-        self.loss_fn = smp.losses.DiceLoss(
-            smp.losses.MULTILABEL_MODE, from_logits=True)
+        self.loss_fn = CombinedLoss(config)
+        self.config = config
 
     def forward(self, image):
         image = (image - self.mean) / self.std
@@ -51,7 +56,7 @@ class Model(pl.LightningModule):
         assert mask.max() <= 1.0 and mask.min() >= 0
 
         logits_mask = self.forward(image)
-        loss = self.loss_fn(logits_mask, mask)
+        loss, losses = self.loss_fn(logits_mask, mask)
 
         thresh = 0.5
         prob_mask = logits_mask.sigmoid()
@@ -60,36 +65,57 @@ class Model(pl.LightningModule):
         tp, fp, fn, tn = smp.metrics.get_stats(
             pred_mask.long(), mask.long(), mode='multilabel')
 
-        return {
+        metrics = {
             'loss': loss,
+            'losses': losses,
             'tp': tp,
             'fp': fp,
             'fn': fn,
             'tn': tn,
         }
 
+        return metrics
+
     def shared_epoch_end(self, outputs, split):
-        # aggregate step metics
+        prefix = f'fold_{self.config.Data.fold_id}/{split}'
+
+        # aggregate step metics to compute iou score
         tp = torch.cat([x['tp'] for x in outputs])
         fp = torch.cat([x['fp'] for x in outputs])
         fn = torch.cat([x['fn'] for x in outputs])
         tn = torch.cat([x['tn'] for x in outputs])
 
-        iou = smp.metrics.iou_score(
-            tp, fp, fn, tn, reduction='macro')
+        iou, iou_classwise = self.compute_iou('macro', tp, fp, fn, tn, prefix)
+        iou_iw, iou_iw_classwise = self.compute_iou('macro-imagewise', tp, fp, fn, tn, prefix)
 
-        iou_imagewise = smp.metrics.iou_score(
-            tp, fp, fn, tn, reduction='macro-imagewise')
+        # aggregate step losses to compute loss
+        loss = torch.stack([x['loss'] for x in outputs]).mean()
 
-        # TODO: compute classwise iou
-        # TODO: add loss to metrics
+        loss_classwise = defaultdict(lambda: [])
+        for x in outputs:
+            for k, v in x['losses'].items():
+                loss_classwise[f'{prefix}/{k}'].append(v)
+        for k in loss_classwise:
+            loss_classwise[k] = torch.stack(loss_classwise[k]).mean()
 
         metrics = {
-            f'{split}/iou': iou,
-            f'{split}/iou_imagewise': iou_imagewise,
+            f'{prefix}/loss': loss,
+            f'{prefix}/iou': iou,
+            f'{prefix}/iou_imagewise': iou_iw,
         }
+        metrics.update(loss_classwise)
+        metrics.update(iou_classwise)
+        metrics.update(iou_iw_classwise)
 
         self.log_dict(metrics, prog_bar=True)
+
+    def compute_iou(self, reduction, tp, fp, fn, tn, prefix):
+        iou_classwise = {}
+        for i, class_name in enumerate(self.config.Model.classes):
+            iou_classwise[f'{prefix}/iou/{class_name}'] = smp.metrics.iou_score(
+                tp[:, i], fp[:, i], fn[:, i], tn[:, i], reduction=reduction)
+        iou = torch.stack([v for v in iou_classwise.values()]).mean()
+        return iou, iou_classwise
 
     def training_step(self, batch, batch_idx):
         return self.shared_step(batch, 'train')
@@ -104,5 +130,23 @@ class Model(pl.LightningModule):
         return self.shared_epoch_end(outputs, 'val')
 
     def configure_optimizers(self):
-        # TODO: configure optimizer and lr scheduler from config
-        return torch.optim.Adam(self.parameters(), lr=0.0001)
+        config = self.config
+
+        # optimizer
+        if config.Optimizer.type == 'adam':
+            optimizer = torch.optim.Adam(self.parameters(),
+                lr=config.Optimizer.lr, weight_decay=config.Optimizer.weight_decay)
+        else:
+            raise ValueError(config.Optimizer.type)
+
+        # lr scheduler
+        if config.Scheduler.type == 'multistep':
+            lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
+                config.Scheduler.multistep_milestones, config.Scheduler.multistep_gamma)
+        else:
+            raise ValueError(config.Scheduler.type)
+
+        return {
+            'optimizer': optimizer,
+            'lr_scheduler': {'scheduler': lr_scheduler, 'interval': 'epoch', 'name': 'lr'}
+        }

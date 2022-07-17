@@ -18,6 +18,6 @@ def get_wandb_logger(config: DictConfig,
         group = f'exp_{config.exp_id:04d}'
 
     return WandbLogger(
-        project='spacenet-8',
+        project=f'sn8-{config.task}',
         group=group,
         config=OmegaConf.to_container(config, resolve=True))

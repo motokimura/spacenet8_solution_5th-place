@@ -10,5 +10,5 @@
 
 ```
 echo "WANDB_API_KEY = {YOUR_WANDB_API_KEY}" > .env
-python tools/train_net.py --type building
+python tools/train_net.py --task building
 ```
