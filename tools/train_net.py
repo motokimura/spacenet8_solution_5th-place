@@ -62,7 +62,7 @@ def main() -> None:
         update_dict={'task': args.task}
     )
 
-    seed_everything(config.General.seed)
+    seed_everything(config.General.seed + config.Data.fold_id * 5555)
 
     output_dir = '_debug' if args.debug else f'exp_{config.exp_id:04d}'
     output_dir = os.path.join(config.Data.artifact_dir, 'models', output_dir)
