@@ -32,18 +32,12 @@ class CombinedLoss(_Loss):
                 raise ValueError(loss_name)
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> Tuple[torch.Tensor, Dict]:
-        losses = {}
-        losses_class_aggregated = defaultdict(lambda: 0)
+        loss = 0
+        losses = defaultdict(lambda: 0)
         for loss_fn, loss_weight, loss_name in zip(self.loss_fns, self.loss_weights, self.loss_names):
             for i, (class_name, class_weight) in enumerate(zip(self.classes, self.class_weights)):
-                loss = loss_weight * class_weight * loss_fn(y_pred[:, i], y_true[:, i])
-                losses[f'loss/{loss_name}>{class_name}'] = loss
-                losses_class_aggregated[f'loss/{loss_name}'] += loss
-
-        loss = 0
-        for v in losses_class_aggregated.values():
-            loss += v
-
-        losses.update(losses_class_aggregated)
-
+                tmp_loss = loss_weight * class_weight * loss_fn(y_pred[:, i], y_true[:, i])
+                losses[f'loss/{loss_name} {class_name}'] = tmp_loss.detach().cpu()  # loss-type wise and class wise
+                losses[f'loss/{loss_name}'] += tmp_loss.detach().cpu()  # loss-type wise (class aggregated)
+                loss += tmp_loss
         return loss, losses

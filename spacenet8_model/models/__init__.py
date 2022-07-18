@@ -79,49 +79,49 @@ class Model(pl.LightningModule):
     def shared_epoch_end(self, outputs, split):
         prefix = f'{split}'
         # loss
-        loss, loss_classwise = self.compute_loss(outputs, prefix=prefix)
+        losses = self.aggregate_loss(outputs, prefix=prefix)
         # iou
-        iou, iou_classwise = self.compute_iou(outputs, reduction='macro', prefix=f'{prefix}/iou')
-        iou_iw, iou_iw_classwise = self.compute_iou(outputs, reduction='macro-imagewise', prefix=f'{prefix}/iou_imagewise')
+        ious = self.aggregate_iou(outputs, reduction='macro', prefix=f'{prefix}/iou')
+        ious_iw = self.aggregate_iou(outputs, reduction='macro-imagewise', prefix=f'{prefix}/iou_imagewise')
 
-        metrics = {
-            f'{prefix}/loss': loss,
-            f'{prefix}/iou': iou,
-            f'{prefix}/iou_imagewise': iou_iw,
-        }
-        metrics.update(loss_classwise)
-        metrics.update(iou_classwise)
-        metrics.update(iou_iw_classwise)
+        metrics = {}
+        metrics.update(losses)
+        metrics.update(ious)
+        metrics.update(ious_iw)
 
         self.log_dict(metrics, prog_bar=True)
 
-    def compute_loss(self, outputs, prefix):
+    def aggregate_loss(self, outputs, prefix):
         # aggregate step losses to compute loss
         loss = torch.stack([x['loss'] for x in outputs]).mean()
 
-        loss_classwise = defaultdict(lambda: [])
+        losses = defaultdict(lambda: [])
         for x in outputs:
             for k, v in x['losses'].items():
-                loss_classwise[f'{prefix}/{k}'].append(v)
-        for k in loss_classwise:
-            loss_classwise[k] = torch.stack(loss_classwise[k]).mean()
+                losses[f'{prefix}/{k}'].append(v)
+        for k in losses:
+            losses[k] = torch.stack(losses[k]).mean()
 
-        return loss, loss_classwise
+        losses[f'{prefix}/loss'] = loss
 
-    def compute_iou(self, outputs, reduction, prefix):
+        return losses
+
+    def aggregate_iou(self, outputs, reduction, prefix):
         # aggregate step metics to compute iou score
         tp = torch.cat([x['tp'] for x in outputs])
         fp = torch.cat([x['fp'] for x in outputs])
         fn = torch.cat([x['fn'] for x in outputs])
         tn = torch.cat([x['tn'] for x in outputs])
 
-        iou_classwise = {}
+        ious = {}
         for i, class_name in enumerate(self.config.Model.classes):
-            iou_classwise[f'{prefix}/{class_name}'] = smp.metrics.iou_score(
+            ious[f'{prefix}/{class_name}'] = smp.metrics.iou_score(
                 tp[:, i], fp[:, i], fn[:, i], tn[:, i], reduction=reduction)
-        iou = torch.stack([v for v in iou_classwise.values()]).mean()
+        iou = torch.stack([v for v in ious.values()]).mean()
 
-        return iou, iou_classwise
+        ious[prefix] = iou
+
+        return ious
 
     def training_step(self, batch, batch_idx):
         return self.shared_step(batch, 'train')
