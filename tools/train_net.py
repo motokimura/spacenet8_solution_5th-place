@@ -19,7 +19,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--task',
-        choices=['building', 'road', 'flood'],
+        choices=['building', 'road', 'building_and_road', 'flood'],
         required=True
     )
     parser.add_argument(
@@ -43,6 +43,8 @@ def get_default_cfg_path(task: str) -> str:
         return 'configs/defaults/foundation_building.yaml'
     elif task == 'road':
         raise NotImplementedError()
+    elif task == 'building_and_road':
+        return 'configs/defaults/foundation_building_and_road.yaml'
     elif task == 'flood':
         raise NotImplementedError()
     else:
@@ -76,7 +78,7 @@ def main() -> None:
         filename='best',
         save_weights_only=False,
         save_top_k=1,
-        monitor=f'fold_{config.Data.fold_id}/val/iou',
+        monitor=f'val/iou',
         mode='max',
         save_last=True)
     lr_monitor_callback = LearningRateMonitor(logging_interval='epoch')
