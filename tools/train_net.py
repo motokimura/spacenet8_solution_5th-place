@@ -23,6 +23,16 @@ def parse_args() -> argparse.Namespace:
         required=True
     )
     parser.add_argument(
+        '--exp_id',
+        type=int,
+        default=9999
+    )
+    parser.add_argument(
+        '--fold_id',
+        type=int,
+        default=0
+    )
+    parser.add_argument(
         '--config',
         default=None,
         help='YAML config path. This will overwrite `configs/default.yaml`')
@@ -59,12 +69,12 @@ def main() -> None:
         default_cfg_path,
         args.config,
         update_dotlist=args.opts,
-        update_dict={'task': args.task}
+        update_dict={'task': args.task, 'exp_id': args.exp_id, 'fold_id': args.fold_id}
     )
 
-    seed_everything(config.General.seed + config.Data.fold_id * 5555)
+    seed_everything(config.General.seed + config.fold_id * 5555)
 
-    output_dir = '_debug' if args.debug else f'exp_{config.exp_id:04d}'
+    output_dir = '_debug' if args.debug else f'exp_{args.exp_id:04d}'
     output_dir = os.path.join(config.Data.artifact_dir, 'models', output_dir)
     if args.debug:
         shutil.rmtree(output_dir, ignore_errors=True)
@@ -86,7 +96,7 @@ def main() -> None:
 
     loggers = [TensorBoardLogger(output_dir, name=None)]
     if (not args.debug) and (not args.disable_wandb):
-        loggers.append(get_wandb_logger(config))
+        loggers.append(get_wandb_logger(config, args.exp_id))
 
     trainer = Trainer(
         max_epochs=2 if args.debug else config.General.epochs,

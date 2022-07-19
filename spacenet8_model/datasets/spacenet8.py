@@ -39,7 +39,7 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
         split = 'train' if is_train else 'val'
         path = os.path.join(config.Data.artifact_dir,
                             'folds',
-                            f'{split}_{config.Data.fold_id}.csv')
+                            f'{split}_{config.fold_id}.csv')
         df = pd.read_csv(path)
 
         # prepare image and mask paths
