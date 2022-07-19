@@ -4,12 +4,12 @@ Data:
   artifact_dir: /wdata
   fold_id: 0
 Dataloader:
-  train_batch_size: 16
+  train_batch_size: 10
   train_num_workers: 6
   val_batch_size: 8
   val_num_workers: 6
 Transform:
-  train_random_crop_size: [320, 320]
+  train_random_crop_size: [512, 512]
   test_size: [1312, 1312]
 Model:
   arch: unet
@@ -21,15 +21,15 @@ Loss:
   class_weights: [1.0, 1.0, 1.0, 1.0, 1.0]
 Optimizer:
   type: adam
-  lr: 1e-4
+  lr: 2e-4
   weight_decay: 0
 Scheduler:
   type: multistep
-  multistep_milestones: [80]
+  multistep_milestones: [80, 120]
   multistep_gamma: 0.1
 General:
   gpus: [0]
-  epochs: 100
+  epochs: 140
   fp16: true
   amp_backend: native # valid when fp16=true
   amp_level: null # valid when amp_backend=apex
