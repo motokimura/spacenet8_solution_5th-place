@@ -12,8 +12,10 @@ def get_transforms(config, is_train):
     else:
         transforms = [
             albu.PadIfNeeded(
-                min_width=config.Transform.test_size[0],
-                min_height=config.Transform.test_size[1],
+                pad_height_divisor=32,
+                pad_width_divisor=32,
+                min_height=None,
+                min_width=None,
                 always_apply=True,
                 border_mode=0,  # 0: cv2.BORDER_CONSTANT
                 value=0,

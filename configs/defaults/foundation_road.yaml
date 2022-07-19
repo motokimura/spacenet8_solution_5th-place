@@ -9,7 +9,6 @@ Dataloader:
   val_num_workers: 6
 Transform:
   train_random_crop_size: [512, 512]
-  test_size: [1312, 1312]
 Model:
   arch: unet
   encoder: timm-efficientnet-b3
