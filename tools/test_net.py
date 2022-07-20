@@ -99,6 +99,9 @@ def main():
     model.to(args.device)
     model.eval()
 
+    out_root = out_dir = os.path.join(args.out_dir, f'preds_{config.task}', f'exp_{args.exp_id:04d}')
+    print(f'will save prediction results under {out_root}')
+
     test_dataloader = get_test_dataloader(config)
     for batch in tqdm(test_dataloader):
         images = batch['image'].to(args.device)
@@ -119,7 +122,7 @@ def main():
             filename = os.path.basename(pre_path)
             filename, _ = os.path.splitext(filename)
             filename = f'{filename}.png'
-            out_dir = os.path.join(args.out_dir, f'preds_{config.task}/{aoi}')
+            out_dir = os.path.join(out_root, aoi)
             os.makedirs(out_dir, exist_ok=True)
             dump_pred_to_png(pred, os.path.join(out_dir, filename))
 
