@@ -22,7 +22,13 @@ def get_transforms(config, is_train):
                 mask_value=0
             ),
         ]
-    return albu.Compose(transforms)
+    return albu.Compose(
+        transforms,
+        additional_targets={
+            'image_post_a': 'image',
+            'image_post_b': 'image'
+        }
+    )
 
 
 def get_test_transforms(config):
@@ -37,4 +43,10 @@ def get_test_transforms(config):
             value=0,
         ),
     ]
-    return albu.Compose(transforms)
+    return albu.Compose(
+        transforms,
+        additional_targets={
+            'image_post_a': 'image',
+            'image_post_b': 'image'
+        }
+    )

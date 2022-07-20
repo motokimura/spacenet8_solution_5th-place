@@ -1,9 +1,36 @@
 import os
+from multiprocessing.sharedctypes import Value
 
 import numpy as np
 import pandas as pd
 import torch
 from skimage import io
+
+
+def load_post_images(post1_path, post2_path, n_input_post_images):
+    if n_input_post_images == 0:
+        return {}
+
+    elif n_input_post_images == 1:
+        post1 = io.imread(post1_path)
+        return {
+            'image_post_a': post1
+        }
+
+    elif n_input_post_images == 2:
+        post1 = io.imread(post1_path)
+        if post2_path is None:
+            # if post-2 image does not exist, just copy post-1 as post-2 image
+            post2 = post1.copy()
+        else:
+            post2 = io.imread(post2_path)
+        return {
+            'image_post_a': post1,
+            'image_post_b': post2
+        }
+
+    else:
+        raise ValueError()
 
 
 class SpaceNet8Dataset(torch.utils.data.Dataset):
@@ -19,19 +46,19 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         pre = io.imread(self.pre_paths[idx])  # HWC
-
-        masks = self.load_masks(idx)
-        mask = self.prepare_target_mask(masks)  # HWC
-
-        # TODO: load post images
-
+        mask = self.load_mask(idx)  # HWC
         sample = dict(image=pre, mask=mask)
+        post_images = self.load_post_images(idx)
+        sample.update(post_images)
+
         if self.transform is not None:
             sample = self.transform(**sample)
 
         # convert format HWC -> CHW
         sample['image'] = np.moveaxis(sample['image'], -1, 0)
         sample['mask'] = np.moveaxis(sample['mask'], -1, 0)
+        for k in post_images:
+            sample[k] = np.moveaxis(sample[k], -1, 0)
 
         return sample
 
@@ -106,11 +133,12 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
         assert len(mask_types) > 0
         return mask_types
 
-    def load_masks(self, idx):
+    def load_mask(self, idx):
         masks = {}
         for mask_type in self.masks_to_load:
             masks[mask_type] = io.imread(self.mask_paths[mask_type][idx])
-        return masks
+        target_mask = self.prepare_target_mask(masks)
+        return target_mask
 
     def prepare_target_mask(self, masks):
         target_mask = []
@@ -135,6 +163,13 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
         target_mask = np.stack(target_mask)  # CHW
         return target_mask.transpose(1, 2, 0)  # HWC
 
+    def load_post_images(self, idx):
+        return load_post_images(
+            self.post1_paths[idx],
+            self.post2_paths[idx],
+            self.config.Model.n_input_post_images
+        )
+
 
 class SpaceNet8TestDataset(torch.utils.data.Dataset):
     def __init__(self, config, transform=None):
@@ -148,15 +183,18 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         pre = io.imread(self.pre_paths[idx])  # HWC
         h, w = pre.shape[:2]
-
-        # TODO: load post images
-
         sample = dict(image=pre)
+
+        post_images = self.load_post_images(idx)
+        sample.update(post_images)
+
         if self.transform is not None:
             sample = self.transform(**sample)
 
         # convert format HWC -> CHW
         sample['image'] = np.moveaxis(sample['image'], -1, 0)
+        for k in post_images:
+            sample[k] = np.moveaxis(sample[k], -1, 0)
 
         # add image metadata
         meta = {
@@ -196,3 +234,10 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
             post2_paths.append(post2)
 
         return pre_paths, post1_paths, post2_paths
+
+    def load_post_images(self, idx):
+        return load_post_images(
+            self.post1_paths[idx],
+            self.post2_paths[idx],
+            self.config.Model.n_input_post_images
+        )

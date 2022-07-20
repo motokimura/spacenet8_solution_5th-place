@@ -15,6 +15,7 @@ Model:
   arch: unet
   encoder: timm-efficientnet-b3
   classes: [building, building_border, building_contact]
+  n_input_post_images: 0
 Loss:
   types: ['dice', 'bce']
   weights: [1.0, 1.0]
