@@ -7,6 +7,8 @@ Dataloader:
   train_num_workers: 6
   val_batch_size: 8
   val_num_workers: 6
+  test_batch_size: 8
+  test_num_workers: 6
 Transform:
   train_random_crop_size: [512, 512]
 Model:

@@ -123,3 +123,52 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
                 raise ValueError(c)
         target_mask = np.stack(target_mask)  # CHW
         return target_mask.transpose(1, 2, 0)  # HWC
+
+
+class SpaceNet8TestDataset(torch.utils.data.Dataset):
+    def __init__(self, config, transform=None):
+        self.pre_paths, self.post_paths, = self.get_file_paths(config)
+
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.pre_paths)
+
+    def __getitem__(self, idx):
+        pre = io.imread(self.pre_paths[idx])  # HWC
+        h, w = pre.shape[:2]
+
+        sample = dict(image=pre)
+        if self.transform is not None:
+            sample = self.transform(**sample)
+
+        # convert format HWC -> CHW
+        sample['image'] = np.moveaxis(sample['image'], -1, 0)
+
+        # add image metadata
+        meta = {
+            'pre_path':self.pre_paths[idx],
+            'original_height': h,
+            'original_width': w
+        }
+        sample.update(meta)
+
+        return sample
+
+    def get_file_paths(self, config):
+        path = os.path.join(config.Data.artifact_dir, 'test.csv')
+        df = pd.read_csv(path)
+
+        # prepare image paths
+        pre_paths = []
+        post_paths = []
+        for i, row in df.iterrows():
+            aoi = row['aoi']
+
+            pre = os.path.join(config.Data.test_dir, aoi, 'PRE-event', row['pre-event image'])
+            os.path.exists(pre), pre
+            pre_paths.append(pre)
+
+            # TODO: post-1 image and post-2 image
+
+        return pre_paths, post_paths

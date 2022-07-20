@@ -19,7 +19,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--task',
-        choices=['building', 'road', 'building_and_road', 'flood'],
+        choices=['building', 'road', 'flood'],
         required=True
     )
     parser.add_argument(
@@ -53,8 +53,6 @@ def get_default_cfg_path(task: str) -> str:
         return 'configs/defaults/foundation_building.yaml'
     elif task == 'road':
         return 'configs/defaults/foundation_road.yaml'
-    elif task == 'building_and_road':
-        return 'configs/defaults/foundation_building_and_road.yaml'
     elif task == 'flood':
         raise NotImplementedError()
     else:
@@ -67,7 +65,7 @@ def main() -> None:
     default_cfg_path: str = get_default_cfg_path(args.task)
     config: DictConfig = load_config(
         default_cfg_path,
-        args.config,
+        [] if args.config is None else [args.config],
         update_dotlist=args.opts,
         update_dict={'task': args.task, 'exp_id': args.exp_id, 'fold_id': args.fold_id}
     )

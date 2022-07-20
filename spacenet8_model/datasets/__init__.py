@@ -2,8 +2,8 @@ from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 
 # isort: off
-from spacenet8_model.datasets.spacenet8 import SpaceNet8Dataset
-from spacenet8_model.datasets.transforms import get_transforms
+from spacenet8_model.datasets.spacenet8 import SpaceNet8Dataset, SpaceNet8TestDataset
+from spacenet8_model.datasets.transforms import get_transforms, get_test_transforms
 # isort: on
 
 
@@ -26,3 +26,15 @@ def get_dataloader(config: DictConfig, is_train: bool) -> DataLoader:
         batch_size=batch_size,
         shuffle=shuffle,
         num_workers=num_workers)
+
+
+def get_test_dataloader(config: DictConfig) -> DataLoader:
+    transforms = get_test_transforms(config)
+
+    dataset = SpaceNet8TestDataset(config, transforms)
+
+    return DataLoader(
+        dataset,
+        batch_size=config.Dataloader.test_batch_size,
+        shuffle=False,
+        num_workers=config.Dataloader.test_num_workers)

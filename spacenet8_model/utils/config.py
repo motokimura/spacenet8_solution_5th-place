@@ -4,12 +4,12 @@ from omegaconf import DictConfig, OmegaConf
 
 
 def load_config(default_cfg_path: str,
-                cfg_path: Optional[str] = None,
+                cfg_paths: Optional[List[str]] = [],
                 update_dotlist: Optional[List[str]] = None,
                 update_dict: Optional[Dict] = None) -> DictConfig:
 
     config = OmegaConf.load(default_cfg_path)
-    if cfg_path is not None:
+    for cfg_path in cfg_paths:
         optional_config = OmegaConf.load(cfg_path)
         config = OmegaConf.merge(config, optional_config)
     if update_dotlist is not None:

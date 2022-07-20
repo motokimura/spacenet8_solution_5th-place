@@ -23,3 +23,18 @@ def get_transforms(config, is_train):
             ),
         ]
     return albu.Compose(transforms)
+
+
+def get_test_transforms(config):
+    transforms = [
+        albu.PadIfNeeded(
+            pad_height_divisor=32,
+            pad_width_divisor=32,
+            min_height=None,
+            min_width=None,
+            always_apply=True,
+            border_mode=0,  # 0: cv2.BORDER_CONSTANT
+            value=0,
+        ),
+    ]
+    return albu.Compose(transforms)
