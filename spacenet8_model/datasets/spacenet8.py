@@ -60,15 +60,15 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
             mask_filename, _ = os.path.splitext(row['pre-event image'])
             mask_filename = f'{mask_filename}.png'
 
-            building_3channel = os.path.join(config.Data.artifact_dir, 'building_masks_3channel', aoi, mask_filename)
+            building_3channel = os.path.join(config.Data.artifact_dir, 'masks_building_3channel', aoi, mask_filename)
             os.path.exists(building_3channel), building_3channel
             building_3channel_paths.append(building_3channel)
 
-            building_flood = os.path.join(config.Data.artifact_dir, 'building_masks_flood', aoi, mask_filename)
+            building_flood = os.path.join(config.Data.artifact_dir, 'masks_building_flood', aoi, mask_filename)
             os.path.exists(building_flood), building_flood
             building_flood_paths.append(building_flood)
 
-            road = os.path.join(config.Data.artifact_dir, 'road_masks', aoi, mask_filename)
+            road = os.path.join(config.Data.artifact_dir, 'masks_road', aoi, mask_filename)
             os.path.exists(road), road
             road_paths.append(road)
 

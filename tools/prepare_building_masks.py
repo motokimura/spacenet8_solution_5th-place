@@ -98,7 +98,7 @@ def prepare_3channel_mask(image_id, args, aoi, out_dir):
 
 
 def prepare_3channel_masks(args, aoi):
-    out_3channels = os.path.join(args.out_dir, 'building_masks_3channel', aoi)
+    out_3channels = os.path.join(args.out_dir, 'masks_building_3channel', aoi)
     os.makedirs(out_3channels, exist_ok=True)
 
     gt_csv_path = get_gt_csv(args, aoi)
@@ -151,7 +151,7 @@ def prepare_flood_mask(image_id, args, aoi, out_dir):
 
 
 def prepare_flood_masks(args, aoi):
-    out_flood = os.path.join(args.out_dir, 'building_masks_flood', aoi)
+    out_flood = os.path.join(args.out_dir, 'masks_building_flood', aoi)
     os.makedirs(out_flood, exist_ok=True)
 
     gt_csv_path = get_gt_csv(args, aoi)

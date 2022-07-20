@@ -90,7 +90,7 @@ def prepare_road_mask(image_id, args, aoi, out_dir):
 
 
 def prepare_road_masks(args, aoi):
-    out_dir = os.path.join(args.out_dir, 'road_masks', aoi)
+    out_dir = os.path.join(args.out_dir, 'masks_road', aoi)
     os.makedirs(out_dir, exist_ok=True)
 
     gt_csv_path = get_gt_csv(args, aoi)

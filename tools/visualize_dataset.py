@@ -34,28 +34,19 @@ def load_images(images, args, aoi):
     pre_image = io.imread(pre_path)
     h, w = pre_image.shape[:2]
 
-    # load post-1 image if exists
-    warped_dir = 'test_warped' if args.test else 'train_warped'
+    # load post-1 image
+    warped_dir = 'warped_posts_test' if args.test else 'warped_posts_train'
     post1_path = os.path.join(args.preprocessed_dir, warped_dir, aoi, post1)
-    post1_exists = os.path.exists(post1_path)
-    if post1_exists:
-        post1_image = io.imread(post1_path)
-    else:
-        post1_image = np.zeros((h, w, 3), dtype=np.uint8)
+    assert os.path.exists(post1_path), post1_path
+    post1_image = io.imread(post1_path)
 
     # load post-2 image if exists
-    post2_exists = False
-    post2_path = None
     if isinstance(post2, str):
         post2_path = os.path.join(args.preprocessed_dir, warped_dir, aoi, post2)
-        post2_exists = os.path.exists(post2_path)
-    if post2_exists:
+        assert os.path.exists(post2_path), post2_path
         post2_image = io.imread(post2_path)
     else:
         post2_image = np.zeros((h, w, 3), dtype=np.uint8)
-
-    # check at least either post1 or post2 exists
-    assert post1_exists or post2_exists, (post1_path, post2_path)
 
     return pre_image, post1_image, post2_image
 
@@ -65,17 +56,17 @@ def load_masks(images, args, aoi):
     image_id, _ = os.path.splitext(pre)
 
     # load building 3-channel mask
-    building_3channel_dir = os.path.join(args.preprocessed_dir, 'building_masks_3channel', aoi)
+    building_3channel_dir = os.path.join(args.preprocessed_dir, 'masks_building_3channel', aoi)
     building_3channel_path = os.path.join(building_3channel_dir, f'{image_id}.png')
     building_3channel = io.imread(building_3channel_path)
 
     # load building flood mask
-    building_flood_dir = os.path.join(args.preprocessed_dir, 'building_masks_flood', aoi)
+    building_flood_dir = os.path.join(args.preprocessed_dir, 'masks_building_flood', aoi)
     building_flood_path = os.path.join(building_flood_dir, f'{image_id}.png')
     building_flood = io.imread(building_flood_path)
 
     # load road mask
-    road_dir = os.path.join(args.preprocessed_dir, 'road_masks', aoi)
+    road_dir = os.path.join(args.preprocessed_dir, 'masks_road', aoi)
     road_path = os.path.join(road_dir, f'{image_id}.png')
     road = io.imread(road_path)
 

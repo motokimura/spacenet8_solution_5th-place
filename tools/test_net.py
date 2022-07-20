@@ -27,6 +27,13 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help='YAML config path. This will overwrite `configs/default.yaml`')
     parser.add_argument(
+        '--artifact_dir',
+        default='/wdata'
+    )
+    parser.add_argument(
+        '--out_dir'
+    )
+    parser.add_argument(
         '--device',
         default='cuda')
     parser.add_argument(
@@ -38,7 +45,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_test_config(args):
-    config_exp_path = os.path.join('/wdata/models', f'exp_{args.exp_id:04d}', 'config.yaml')
+    config_exp_path = os.path.join(args.artifact_dir, f'models/exp_{args.exp_id:04d}/config.yaml')
     config_exp: DictConfig = OmegaConf.load(config_exp_path)
     task: str = config_exp.task
 
@@ -82,11 +89,12 @@ def dump_pred_to_png(pred, png_path):
 
 def main():
     args = parse_args()
+    args.out_dir = args.artifact_dir if args.out_dir is None else args.out_dir
 
     config: DictConfig = load_test_config(args)
 
     model = get_model(config)
-    ckpt_path = os.path.join('/wdata/models', f'exp_{args.exp_id:04d}', 'best.ckpt')
+    ckpt_path = os.path.join(args.artifact_dir, f'models/exp_{args.exp_id:04d}/best.ckpt')
     model.load_state_dict(torch.load(ckpt_path, map_location=torch.device('cpu'))['state_dict'])
     model.to(args.device)
     model.eval()
@@ -111,7 +119,7 @@ def main():
             filename = os.path.basename(pre_path)
             filename, _ = os.path.splitext(filename)
             filename = f'{filename}.png'
-            out_dir = os.path.join(f'/wdata/preds_{config.task}/{aoi}')
+            out_dir = os.path.join(args.out_dir, f'preds_{config.task}/{aoi}')
             os.makedirs(out_dir, exist_ok=True)
             dump_pred_to_png(pred, os.path.join(out_dir, filename))
 

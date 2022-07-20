@@ -13,7 +13,7 @@ from tqdm import tqdm
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--root_dir', default='/data/train')
-    parser.add_argument('--out_dir', default='/wdata/train_warped')
+    parser.add_argument('--out_dir', default='/wdata/warped_posts_train')
     return parser.parse_args()
 
 
@@ -31,29 +31,23 @@ def warp_image(images, args, aoi, out_dir):
     pre_image = io.imread(pre_path)
     h, w = pre_image.shape[:2]
 
-    # check at least either post1 or post2 exists
+    # warp post-1 image
     post1_path = os.path.join(args.root_dir, aoi, 'POST-event', post1)
-    post1_exists = os.path.exists(post1_path)
+    assert os.path.exists(post1_path), post1_path
+    ds1 = gdal.Warp(
+        os.path.join(out_dir, post1),
+        post1_path,
+        width=w,
+        height=h,
+        resampleAlg=gdal.GRIORA_Bilinear,
+        outputType=gdal.GDT_Byte
+    )
+    ds1 = None
 
-    post2_exists = False
-    post2_path = None
+    # warp post-2 image
     if isinstance(post2, str):
         post2_path = os.path.join(args.root_dir, aoi, 'POST-event', post2)
-        post2_exists = os.path.exists(post2_path)
-
-    assert post1_exists or post2_exists, (post1_path, post2_path)
-
-    # warp post images
-    if post1_exists:
-        ds1 = gdal.Warp(
-            os.path.join(out_dir, post1),
-            post1_path,
-            width=w,
-            height=h,
-            resampleAlg=gdal.GRIORA_Bilinear,
-            outputType=gdal.GDT_Byte
-        )
-    if post2_exists:
+        assert os.path.exists(post2_path), post2_path
         ds2 = gdal.Warp(
             os.path.join(out_dir, post2),
             post2_path,
@@ -62,6 +56,7 @@ def warp_image(images, args, aoi, out_dir):
             resampleAlg=gdal.GRIORA_Bilinear,
             outputType=gdal.GDT_Byte
         )
+        ds2 = None
 
 
 def warp_images(args, aoi):
@@ -81,7 +76,7 @@ def main():
     args = parse_args()
     aois = [d for d in os.listdir(args.root_dir) if os.path.isdir(os.path.join(args.root_dir, d))]
     for aoi in aois:
-        print(f'preparing post images of {aoi} AOI')
+        print(f'warping post images of {aoi} AOI')
         warp_images(args, aoi)
 
 if __name__ == '__main__':
