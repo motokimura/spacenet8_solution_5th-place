@@ -8,10 +8,10 @@ from skimage import io
 
 class SpaceNet8Dataset(torch.utils.data.Dataset):
     def __init__(self, config, is_train, transform=None):
-        self.pre_paths, self.post_paths, self.mask_paths = self.get_file_paths(config, is_train)
+        self.pre_paths, self.post1_paths, self.post2_paths, self.mask_paths = self.get_file_paths(config, is_train)
         self.masks_to_load = self.get_mask_types_to_load(config)
 
-        self.classes = config.Model.classes
+        self.config = config
         self.transform = transform
 
     def __len__(self):
@@ -23,7 +23,7 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
         masks = self.load_masks(idx)
         mask = self.prepare_target_mask(masks)  # HWC
 
-        # TODO: load post image
+        # TODO: load post images
 
         sample = dict(image=pre, mask=mask)
         if self.transform is not None:
@@ -44,7 +44,8 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
 
         # prepare image and mask paths
         pre_paths = []
-        post_paths = []
+        post1_paths = []
+        post2_paths = []
         building_3channel_paths = []
         building_flood_paths = []
         road_paths = []
@@ -52,24 +53,34 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
             aoi = row['aoi']
 
             pre = os.path.join(config.Data.train_dir, aoi, 'PRE-event', row['pre-event image'])
-            os.path.exists(pre), pre
+            assert os.path.exists(pre), pre
             pre_paths.append(pre)
 
-            # TODO: post-1 image and post-2 image
+            post1 = os.path.join(config.Data.artifact_dir, 'warped_posts_train', aoi, row['post-event image 1'])
+            assert os.path.exists(post1), post1
+            post1_paths.append(post1)
+
+            post2 = row['post-event image 2']
+            if isinstance(post2, str):
+                post2 = os.path.join(config.Data.artifact_dir, 'warped_posts_train', aoi, post2)
+                assert os.path.exists(post2), post2
+            else:
+                post2 = None
+            post2_paths.append(post2)
 
             mask_filename, _ = os.path.splitext(row['pre-event image'])
             mask_filename = f'{mask_filename}.png'
 
             building_3channel = os.path.join(config.Data.artifact_dir, 'masks_building_3channel', aoi, mask_filename)
-            os.path.exists(building_3channel), building_3channel
+            assert os.path.exists(building_3channel), building_3channel
             building_3channel_paths.append(building_3channel)
 
             building_flood = os.path.join(config.Data.artifact_dir, 'masks_building_flood', aoi, mask_filename)
-            os.path.exists(building_flood), building_flood
+            assert os.path.exists(building_flood), building_flood
             building_flood_paths.append(building_flood)
 
             road = os.path.join(config.Data.artifact_dir, 'masks_road', aoi, mask_filename)
-            os.path.exists(road), road
+            assert os.path.exists(road), road
             road_paths.append(road)
 
         mask_paths = {
@@ -77,7 +88,7 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
             'building_flood': building_flood_paths,
             'road': road_paths,
         }
-        return pre_paths, post_paths, mask_paths
+        return pre_paths, post1_paths, post2_paths, mask_paths
 
     def get_mask_types_to_load(self, config):
         mask_types = []
@@ -103,7 +114,7 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
 
     def prepare_target_mask(self, masks):
         target_mask = []
-        for c in self.classes:
+        for c in self.config.Model.classes:
             # building
             if c == 'building':
                 target_mask.append((masks['building_3channel'][:, :, 0] > 0).astype(np.float32))
@@ -127,7 +138,7 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
 
 class SpaceNet8TestDataset(torch.utils.data.Dataset):
     def __init__(self, config, transform=None):
-        self.pre_paths, self.post_paths, = self.get_file_paths(config)
+        self.pre_paths, self.post1_paths, self.post2_paths = self.get_file_paths(config)
 
         self.transform = transform
 
@@ -137,6 +148,8 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         pre = io.imread(self.pre_paths[idx])  # HWC
         h, w = pre.shape[:2]
+
+        # TODO: load post images
 
         sample = dict(image=pre)
         if self.transform is not None:
@@ -161,14 +174,25 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
 
         # prepare image paths
         pre_paths = []
-        post_paths = []
+        post1_paths = []
+        post2_paths = []
         for i, row in df.iterrows():
             aoi = row['aoi']
 
             pre = os.path.join(config.Data.test_dir, aoi, 'PRE-event', row['pre-event image'])
-            os.path.exists(pre), pre
+            assert os.path.exists(pre), pre
             pre_paths.append(pre)
 
-            # TODO: post-1 image and post-2 image
+            post1 = os.path.join(config.Data.artifact_dir, 'warped_posts_test', aoi, row['post-event image 1'])
+            assert os.path.exists(post1), post1
+            post1_paths.append(post1)
 
-        return pre_paths, post_paths
+            post2 = row['post-event image 2']
+            if isinstance(post2, str):
+                post2 = os.path.join(config.Data.artifact_dir, 'warped_posts_test', aoi, post2)
+                assert os.path.exists(post2), post2
+            else:
+                post2 = None
+            post2_paths.append(post2)
+
+        return pre_paths, post1_paths, post2_paths
