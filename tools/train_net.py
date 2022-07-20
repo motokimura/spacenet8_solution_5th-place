@@ -54,9 +54,9 @@ def get_default_cfg_path(task: str) -> str:
     elif task == 'road':
         return 'configs/defaults/foundation_road.yaml'
     elif task == 'flood':
-        raise NotImplementedError()
+        return 'configs/defaults/flood.yaml'
     else:
-        raise ValueError()
+        raise ValueError(task)
 
 
 def main() -> None:

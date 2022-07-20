@@ -109,8 +109,18 @@ def main():
         batch_orig_heights = batch['original_height']
         batch_orig_widths = batch['original_width']
 
+        n_input_post_images = config.Model.n_input_post_images
+        assert n_input_post_images in [0, 1, 2]
+        images_post_a = None
+        images_post_b = None
+        if n_input_post_images == 1:
+            images_post_a = batch['image_post_a'].to(args.device)
+        elif n_input_post_images == 2:
+            images_post_a = batch['image_post_a'].to(args.device)
+            images_post_b = batch['image_post_b'].to(args.device)
+
         with torch.no_grad(): 
-            batch_preds = model(images)
+            batch_preds = model(images, images_post_a, images_post_b)
         batch_preds = torch.sigmoid(batch_preds)
         batch_preds = batch_preds.cpu().numpy()
 

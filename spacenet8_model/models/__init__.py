@@ -20,11 +20,13 @@ def get_model(config: DictConfig) -> torch.nn.Module:
 class Model(pl.LightningModule):
 
     def __init__(self, config, **kwargs):
+        assert config.Model.n_input_post_images in [0, 1, 2], config.Model.n_input_post_images
+
         super().__init__()
         self.model = smp.create_model(
             config.Model.arch,
             encoder_name=config.Model.encoder,
-            in_channels=3,
+            in_channels=(1 + config.Model.n_input_post_images) * 3,
             classes=len(config.Model.classes),
             encoder_weights="imagenet",
             **kwargs)
@@ -39,23 +41,58 @@ class Model(pl.LightningModule):
         self.loss_fn = CombinedLoss(config)
         self.config = config
 
-    def forward(self, image):
-        image = (image - self.mean) / self.std
-        mask = self.model(image)
+    def forward(self, image, image_post_a=None, image_post_b=None):
+        image = self.preprocess_images(image, image_post_a, image_post_b)
+        mask = self.model(**image)
         return mask
 
-    def shared_step(self, batch, split):
+    def preprocess_images(self, image, image_post_a=None, image_post_b=None):
+        n_input_post_images = self.config.Model.n_input_post_images
+        # check
+        if n_input_post_images == 0:
+            assert image_post_a is None
+            assert image_post_b is None
+        elif n_input_post_images == 1:
+            assert image_post_a is not None
+            assert image_post_b is None
+        elif n_input_post_images == 2:
+            assert image_post_a is not None
+            assert image_post_b is not None
 
+        # preprocess
+        image = (image - self.mean) / self.std
+        if n_input_post_images == 1:
+            image_post_a = (image_post_a - self.mean) / self.std
+            image = torch.cat([image, image_post_a], axis=1)
+        elif n_input_post_images == 2:
+            image_post_a = (image_post_a - self.mean) / self.std
+            image_post_b = (image_post_b - self.mean) / self.std
+            image = torch.cat([image, image_post_a, image_post_b], axis=1)
+
+        return {'x': image}
+
+    def shared_step(self, batch, split):
         image = batch['image']
         assert image.ndim == 4
         h, w = image.shape[2:]
         assert h % 32 == 0 and w % 32 == 0
 
+        n_input_post_images = self.config.Model.n_input_post_images
+        if n_input_post_images == 0:
+            image_post_a = None
+            image_post_b = None
+        if n_input_post_images == 1:
+            image_post_a = batch['image_post_a']
+            image_post_b = None
+        elif n_input_post_images == 2:
+            image_post_a = batch['image_post_a']
+            image_post_b = batch['image_post_b']
+
         mask = batch['mask']
         assert mask.ndim == 4
         assert mask.max() <= 1.0 and mask.min() >= 0
 
-        logits_mask = self.forward(image)
+        logits_mask = self.forward(image, image_post_a, image_post_b)
         loss, losses = self.loss_fn(logits_mask, mask)
 
         thresh = 0.5

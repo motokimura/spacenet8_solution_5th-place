@@ -1,5 +1,4 @@
 import os
-from multiprocessing.sharedctypes import Value
 
 import numpy as np
 import pandas as pd
@@ -30,7 +29,7 @@ def load_post_images(post1_path, post2_path, n_input_post_images):
         }
 
     else:
-        raise ValueError()
+        raise ValueError(n_input_post_images)
 
 
 class SpaceNet8Dataset(torch.utils.data.Dataset):
@@ -175,6 +174,7 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
     def __init__(self, config, transform=None):
         self.pre_paths, self.post1_paths, self.post2_paths = self.get_file_paths(config)
 
+        self.config = config
         self.transform = transform
 
     def __len__(self):
@@ -198,7 +198,7 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
 
         # add image metadata
         meta = {
-            'pre_path':self.pre_paths[idx],
+            'pre_path': self.pre_paths[idx],
             'original_height': h,
             'original_width': w
         }
