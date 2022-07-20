@@ -1,5 +1,4 @@
 import os
-from multiprocessing.sharedctypes import Value
 
 import numpy as np
 import pandas as pd
@@ -20,14 +19,15 @@ def load_post_images(post1_path, post2_path, n_input_post_images):
     elif n_input_post_images == 2:
         post1 = io.imread(post1_path)
         if post2_path is None:
-            # if post-2 image does not exist, just copy post-1 as post-2 image
-            post2 = post1.copy()
+            return {
+                'image_post_a': post1
+            }
         else:
             post2 = io.imread(post2_path)
-        return {
-            'image_post_a': post1,
-            'image_post_b': post2
-        }
+            return {
+                'image_post_a': post1,
+                'image_post_b': post2
+            }
 
     else:
         raise ValueError()
@@ -54,11 +54,13 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
         if self.transform is not None:
             sample = self.transform(**sample)
 
+        if (self.config.Model.n_input_post_images == 2) and ('image_post_b' not in sample):
+            sample['image_post_b'] = sample['image_post_a'].copy()
+
         # convert format HWC -> CHW
-        sample['image'] = np.moveaxis(sample['image'], -1, 0)
-        sample['mask'] = np.moveaxis(sample['mask'], -1, 0)
-        for k in post_images:
-            sample[k] = np.moveaxis(sample[k], -1, 0)
+        for k in sample:
+            if k in ['image', 'mask', 'image_post_a', 'image_post_b']:
+                sample[k] = np.moveaxis(sample[k], -1, 0)
 
         return sample
 
@@ -191,10 +193,13 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
         if self.transform is not None:
             sample = self.transform(**sample)
 
+        if (self.config.Model.n_input_post_images == 2) and ('image_post_b' not in sample):
+            sample['image_post_b'] = sample['image_post_a'].copy()
+
         # convert format HWC -> CHW
-        sample['image'] = np.moveaxis(sample['image'], -1, 0)
-        for k in post_images:
-            sample[k] = np.moveaxis(sample[k], -1, 0)
+        for k in sample:
+            if k in ['image', 'image_post_a', 'image_post_b']:
+                sample[k] = np.moveaxis(sample[k], -1, 0)
 
         # add image metadata
         meta = {
