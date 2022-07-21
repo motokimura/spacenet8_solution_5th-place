@@ -123,10 +123,10 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
         if ('building' in cs) or ('building_border' in cs) or ('building_contact' in cs):
             mask_types.append('building_3channel')
 
-        if ('flood' in cs) or ('flood_building' in cs):
+        if ('flood' in cs) or ('flood_building' in cs) or ('not_flood_building' in cs):
             mask_types.append('building_flood')
 
-        if ('road' in cs) or ('road_junction' in cs) or ('flood' in cs) or ('flood_road' in cs):
+        if ('road' in cs) or ('road_junction' in cs) or ('flood' in cs) or ('flood_road' in cs) or ('not_flood_road' in cs):
             mask_types.append('road')
 
         assert len(mask_types) > 0
@@ -161,6 +161,10 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
                 target_mask.append((masks['building_flood'][:, :, 0] > 0).astype(np.float32))
             elif c == 'flood_road':
                 target_mask.append((masks['road'][:, :, 0] > 0).astype(np.float32))
+            elif c == 'not_flood_building':
+                target_mask.append((masks['building_flood'][:, :, 1] > 0).astype(np.float32))
+            elif c == 'not_flood_road':
+                target_mask.append((masks['road'][:, :, 1] > 0).astype(np.float32))
             else:
                 raise ValueError(c)
         target_mask = np.stack(target_mask)  # CHW
