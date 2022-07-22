@@ -7,6 +7,7 @@ from omegaconf import DictConfig
 
 # isort: off
 from spacenet8_model.models.losses import CombinedLoss
+from spacenet8_model.models.siamese import SiameseModel
 # isort: on
 
 
@@ -21,15 +22,20 @@ class Model(pl.LightningModule):
 
     def __init__(self, config, **kwargs):
         assert config.Model.n_input_post_images in [0, 1, 2], config.Model.n_input_post_images
+        assert config.Model.type in ['seg', 'siamese'], config.Model.type
 
         super().__init__()
-        self.model = smp.create_model(
-            config.Model.arch,
-            encoder_name=config.Model.encoder,
-            in_channels=(1 + config.Model.n_input_post_images) * 3,
-            classes=len(config.Model.classes),
-            encoder_weights="imagenet",
-            **kwargs)
+
+        if config.Model.type == 'seg':
+            self.model = smp.create_model(
+                config.Model.arch,
+                encoder_name=config.Model.encoder,
+                in_channels=(1 + config.Model.n_input_post_images) * 3,
+                classes=len(config.Model.classes),
+                encoder_weights="imagenet",
+                **kwargs)
+        elif config.Model.type == 'siamese':
+            self.model = SiameseModel(config, **kwargs)
 
         # model parameters to preprocess input image
         params = smp.encoders.get_preprocessing_params(config.Model.encoder)
@@ -63,13 +69,22 @@ class Model(pl.LightningModule):
         image = (image - self.mean) / self.std
         if n_input_post_images == 1:
             image_post_a = (image_post_a - self.mean) / self.std
-            image = torch.cat([image, image_post_a], axis=1)
         elif n_input_post_images == 2:
             image_post_a = (image_post_a - self.mean) / self.std
             image_post_b = (image_post_b - self.mean) / self.std
-            image = torch.cat([image, image_post_a, image_post_b], axis=1)
 
-        return {'x': image}
+        if self.config.Model.type == 'seg':
+            if n_input_post_images == 1:
+                image = torch.cat([image, image_post_a], axis=1)
+            elif n_input_post_images == 2:
+                image = torch.cat([image, image_post_a, image_post_b], axis=1)
+            return {'x': image}
+        elif self.config.Model.type == 'siamese':
+            if n_input_post_images == 1:
+                images_post = [image_post_a]
+            elif n_input_post_images == 2:
+                images_post = [image_post_a, image_post_b]
+            return {'image': image, 'images_post': images_post}
 
     def shared_step(self, batch, split):
         image = batch['image']
