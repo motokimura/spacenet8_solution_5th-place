@@ -6,32 +6,6 @@ import torch
 from skimage import io
 
 
-def load_post_images(post1_path, post2_path, n_input_post_images):
-    if n_input_post_images == 0:
-        return {}
-
-    elif n_input_post_images == 1:
-        post1 = io.imread(post1_path)
-        return {
-            'image_post_a': post1
-        }
-
-    elif n_input_post_images == 2:
-        post1 = io.imread(post1_path)
-        if post2_path is None:
-            # if post-2 image does not exist, just copy post-1 as post-2 image
-            post2 = post1.copy()
-        else:
-            post2 = io.imread(post2_path)
-        return {
-            'image_post_a': post1,
-            'image_post_b': post2
-        }
-
-    else:
-        raise ValueError(n_input_post_images)
-
-
 class SpaceNet8Dataset(torch.utils.data.Dataset):
     def __init__(self, config, is_train, transform=None):
         self.pre_paths, self.post1_paths, self.post2_paths, self.mask_paths = self.get_file_paths(config, is_train)
@@ -249,3 +223,29 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
             self.post2_paths[idx],
             self.config.Model.n_input_post_images
         )
+
+
+def load_post_images(post1_path, post2_path, n_input_post_images):
+    if n_input_post_images == 0:
+        return {}
+
+    elif n_input_post_images == 1:
+        post1 = io.imread(post1_path)
+        return {
+            'image_post_a': post1
+        }
+
+    elif n_input_post_images == 2:
+        post1 = io.imread(post1_path)
+        if post2_path is None:
+            # if post-2 image does not exist, just copy post-1 as post-2 image
+            post2 = post1.copy()
+        else:
+            post2 = io.imread(post2_path)
+        return {
+            'image_post_a': post1,
+            'image_post_b': post2
+        }
+
+    else:
+        raise ValueError(n_input_post_images)

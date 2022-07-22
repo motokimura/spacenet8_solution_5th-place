@@ -99,7 +99,7 @@ def main():
     model.to(args.device)
     model.eval()
 
-    out_root = out_dir = os.path.join(args.out_dir, f'preds_{config.task}', f'exp_{args.exp_id:04d}')
+    out_root = out_dir = os.path.join(args.out_dir, 'preds', f'exp_{args.exp_id:04d}')
     print(f'will save prediction results under {out_root}')
 
     test_dataloader = get_test_dataloader(config)

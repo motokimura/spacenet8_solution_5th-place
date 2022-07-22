@@ -1,3 +1,4 @@
+import os
 from collections import defaultdict
 
 import pytorch_lightning as pl
@@ -15,7 +16,12 @@ def get_model(config: DictConfig) -> torch.nn.Module:
     kwargs = {
         # TODO: map config parameters to kwargs based on the architecture
     }
-    return Model(config, **kwargs)
+    model = Model(config, **kwargs)
+
+    if config.Model.pretrained_siamese_branch_exp_id >= 0:
+        model = load_pretrained_siamese_branch(config, model)
+
+    return model
 
 
 class Model(pl.LightningModule):
@@ -208,3 +214,32 @@ class Model(pl.LightningModule):
             'optimizer': optimizer,
             'lr_scheduler': {'scheduler': lr_scheduler, 'interval': 'epoch', 'name': 'lr'}
         }
+
+
+def load_pretrained_siamese_branch(config, model):
+    assert config.Model.type == 'siamese', config.Model.type
+
+    ckpt_path = os.path.join('/wdata/models', f'exp_{config.Model.pretrained_siamese_branch_exp_id:04d}/best.ckpt')
+    assert os.path.exists(ckpt_path)
+    state_dict_orig = torch.load(ckpt_path)['state_dict']
+
+    state_dict = state_dict_orig.copy()
+    for k in state_dict_orig:
+        if not k.startswith('model.'):
+            continue
+        if k.startswith('model.segmentation_head.'):
+            del state_dict[k]
+            continue
+        state_dict[k.replace('model.', 'model.branch.')] = state_dict_orig[k]
+        del state_dict[k]
+
+    imcompatible_keys = model.load_state_dict(state_dict, strict=False)
+    assert len(imcompatible_keys.unexpected_keys) == 0
+
+    expected_missing_keys = []
+    for i in range(config.Model.n_siamese_head_convs):
+        expected_missing_keys.append(f'model.head.{i}.weight')
+        expected_missing_keys.append(f'model.head.{i}.bias')
+    assert imcompatible_keys.missing_keys == expected_missing_keys
+
+    return model
