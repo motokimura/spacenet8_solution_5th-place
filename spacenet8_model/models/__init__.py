@@ -220,7 +220,9 @@ def load_pretrained_siamese_branch(config, model):
     assert config.Model.type == 'siamese', config.Model.type
 
     ckpt_path = os.path.join('/wdata/models', f'exp_{config.Model.pretrained_siamese_branch_exp_id:04d}/best.ckpt')
-    assert os.path.exists(ckpt_path)
+    assert os.path.exists(ckpt_path), ckpt_path
+    print(f'loading {ckpt_path}')
+
     state_dict_orig = torch.load(ckpt_path)['state_dict']
 
     state_dict = state_dict_orig.copy()
@@ -234,12 +236,12 @@ def load_pretrained_siamese_branch(config, model):
         del state_dict[k]
 
     imcompatible_keys = model.load_state_dict(state_dict, strict=False)
-    assert len(imcompatible_keys.unexpected_keys) == 0
+    assert len(imcompatible_keys.unexpected_keys) == 0, len(imcompatible_keys.unexpected_keys)
 
     expected_missing_keys = []
     for i in range(config.Model.n_siamese_head_convs):
         expected_missing_keys.append(f'model.head.{i}.weight')
         expected_missing_keys.append(f'model.head.{i}.bias')
-    assert imcompatible_keys.missing_keys == expected_missing_keys
+    assert imcompatible_keys.missing_keys == expected_missing_keys, (imcompatible_keys.missing_keys, expected_missing_keys)
 
     return model
