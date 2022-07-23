@@ -9,6 +9,8 @@ def get_transforms(config, is_train):
                 height=config.Transform.train_random_crop_size[1],
                 always_apply=True),
         ]
+        if config.Transform.train_random_flip_prob > 0:
+            transforms.append(albu.Flip(p=config.Transform.train_random_flip_prob))
     else:
         transforms = [
             albu.PadIfNeeded(
