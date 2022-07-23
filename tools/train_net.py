@@ -43,7 +43,7 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help='YAML config path. This will overwrite `configs/default.yaml`')
     parser.add_argument(
-        '--debug', action='store_true', help='run in debug mode')
+        '--dry', action='store_true', help='dry-run mode')
     parser.add_argument(
         '--disable_wandb', action='store_true', help='disable W&B logger')
     parser.add_argument(
@@ -80,9 +80,9 @@ def main() -> None:
 
     seed_everything(config.General.seed + config.fold_id * 5555)
 
-    output_dir = '_debug' if args.debug else f'exp_{args.exp_id:04d}'
+    output_dir = '_dry' if args.dry else f'exp_{args.exp_id:04d}'
     output_dir = os.path.join(config.Data.artifact_dir, 'models', output_dir)
-    if args.debug:
+    if args.dry:
         shutil.rmtree(output_dir, ignore_errors=True)
     os.makedirs(output_dir, exist_ok=False)
     print(f'will save training results under {output_dir}')
@@ -101,11 +101,11 @@ def main() -> None:
     callbacks = [checkpoint_callback, lr_monitor_callback]
 
     loggers = [TensorBoardLogger(output_dir, name=None)]
-    if (not args.debug) and (not args.disable_wandb):
+    if (not args.dry) and (not args.disable_wandb):
         loggers.append(get_wandb_logger(config, args.exp_id))
 
     trainer = Trainer(
-        max_epochs=2 if args.debug else config.General.epochs,
+        max_epochs=2 if args.dry else config.General.epochs,
         callbacks=callbacks,
         logger=loggers,
         precision=16 if config.General.fp16 else 32,
@@ -117,8 +117,8 @@ def main() -> None:
         auto_select_gpus=False,
         default_root_dir=os.getcwd(),
         gpus=config.General.gpus,
-        limit_train_batches=2 if args.debug else 1.0,
-        limit_val_batches=2 if args.debug else 1.0,
+        limit_train_batches=2 if args.dry else 1.0,
+        limit_val_batches=2 if args.dry else 1.0,
     )
 
     model = get_model(config, pretrained_exp_id=args.pretrained)
