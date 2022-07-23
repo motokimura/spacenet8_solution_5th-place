@@ -19,9 +19,20 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         pre = io.imread(self.pre_paths[idx])  # HWC
+        h, w = pre.shape[:2]
+        
         mask = self.load_mask(idx)  # HWC
+        h_mask, w_mask = mask.shape[:2]
+        assert h_mask == h
+        assert w_mask == w
+
         sample = dict(image=pre, mask=mask)
+
         post_images = self.load_post_images(idx)
+        for k in post_images:
+            h_post, w_post = post_images[k].shape[:2]
+            assert h == h_post
+            assert w == w_post
         sample.update(post_images)
 
         if self.transform is not None:
@@ -153,8 +164,8 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
 
 
 class SpaceNet8TestDataset(torch.utils.data.Dataset):
-    def __init__(self, config, transform=None):
-        self.pre_paths, self.post1_paths, self.post2_paths = self.get_file_paths(config)
+    def __init__(self, config, transform=None, test_to_val=False):
+        self.pre_paths, self.post1_paths, self.post2_paths = self.get_file_paths(config, test_to_val)
 
         self.config = config
         self.transform = transform
@@ -168,6 +179,10 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
         sample = dict(image=pre)
 
         post_images = self.load_post_images(idx)
+        for k in post_images:
+            h_post, w_post = post_images[k].shape[:2]
+            assert h == h_post
+            assert w == w_post
         sample.update(post_images)
 
         if self.transform is not None:
@@ -188,9 +203,16 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
 
         return sample
 
-    def get_file_paths(self, config):
-        path = os.path.join(config.Data.artifact_dir, 'test.csv')
-        df = pd.read_csv(path)
+    def get_file_paths(self, config, test_to_val=False):
+        if test_to_val:
+            csv_path = os.path.join(config.Data.artifact_dir, f'folds/val_{config.fold_id}.csv')
+            data_root = config.Data.train_dir
+            post_image_dir = os.path.join(config.Data.artifact_dir, 'warped_posts_train')
+        else:
+            csv_path = os.path.join(config.Data.artifact_dir, 'test.csv')
+            data_root = config.Data.test_dir
+            post_image_dir = os.path.join(config.Data.artifact_dir, 'warped_posts_test')
+        df = pd.read_csv(csv_path)
 
         # prepare image paths
         pre_paths = []
@@ -199,17 +221,17 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
         for i, row in df.iterrows():
             aoi = row['aoi']
 
-            pre = os.path.join(config.Data.test_dir, aoi, 'PRE-event', row['pre-event image'])
+            pre = os.path.join(data_root, aoi, 'PRE-event', row['pre-event image'])
             assert os.path.exists(pre), pre
             pre_paths.append(pre)
 
-            post1 = os.path.join(config.Data.artifact_dir, 'warped_posts_test', aoi, row['post-event image 1'])
+            post1 = os.path.join(post_image_dir, aoi, row['post-event image 1'])
             assert os.path.exists(post1), post1
             post1_paths.append(post1)
 
             post2 = row['post-event image 2']
             if isinstance(post2, str):
-                post2 = os.path.join(config.Data.artifact_dir, 'warped_posts_test', aoi, post2)
+                post2 = os.path.join(post_image_dir, aoi, post2)
                 assert os.path.exists(post2), post2
             else:
                 post2 = None

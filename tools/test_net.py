@@ -31,11 +31,16 @@ def parse_args() -> argparse.Namespace:
         default='/wdata'
     )
     parser.add_argument(
-        '--out_dir'
+        '--out_dir',
+        default='/wdata'
     )
     parser.add_argument(
         '--device',
         default='cuda')
+    parser.add_argument(
+        '--val',
+        action='store_true'
+    )
     parser.add_argument(
         'opts',
         default=None,
@@ -79,7 +84,9 @@ def crop_center(pred, crop_wh):
 
 def dump_pred_to_png(pred, png_path):
     c, h, w = pred.shape
-    assert c <= 3
+    # assert c <= 3
+    if c > 3:
+        pred = pred[:3]  # XXX: save all channels as TIFF
     assert pred.min() >= 0
     assert pred.max() <= 1
     array = np.zeros(shape=[h, w, 3], dtype=np.uint8)
@@ -89,7 +96,6 @@ def dump_pred_to_png(pred, png_path):
 
 def main():
     args = parse_args()
-    args.out_dir = args.artifact_dir if args.out_dir is None else args.out_dir
 
     config: DictConfig = load_test_config(args)
 
@@ -99,10 +105,11 @@ def main():
     model.to(args.device)
     model.eval()
 
-    out_root = out_dir = os.path.join(args.out_dir, 'preds', f'exp_{args.exp_id:04d}')
+    out_root = 'val_preds' if args.val else 'preds'
+    out_root = os.path.join(args.out_dir, out_root, f'exp_{args.exp_id:04d}')
     print(f'will save prediction results under {out_root}')
 
-    test_dataloader = get_test_dataloader(config)
+    test_dataloader = get_test_dataloader(config, test_to_val=args.val)
     for batch in tqdm(test_dataloader):
         images = batch['image'].to(args.device)
         batch_pre_paths = batch['pre_path']

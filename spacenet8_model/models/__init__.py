@@ -25,7 +25,6 @@ def get_model(config: DictConfig, pretrained_exp_id: int = -1) -> torch.nn.Modul
 
 
 class Model(pl.LightningModule):
-
     def __init__(self, config, **kwargs):
         assert config.Model.n_input_post_images in [0, 1, 2], config.Model.n_input_post_images
         assert config.Model.type in ['seg', 'siamese'], config.Model.type

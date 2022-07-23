@@ -28,10 +28,10 @@ def get_dataloader(config: DictConfig, is_train: bool) -> DataLoader:
         num_workers=num_workers)
 
 
-def get_test_dataloader(config: DictConfig) -> DataLoader:
+def get_test_dataloader(config: DictConfig, test_to_val: bool = False) -> DataLoader:
     transforms = get_test_transforms(config)
 
-    dataset = SpaceNet8TestDataset(config, transforms)
+    dataset = SpaceNet8TestDataset(config, transforms, test_to_val)
 
     return DataLoader(
         dataset,
