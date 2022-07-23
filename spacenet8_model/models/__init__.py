@@ -207,6 +207,12 @@ class Model(pl.LightningModule):
         if config.Scheduler.type == 'multistep':
             lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
                 config.Scheduler.multistep_milestones, config.Scheduler.multistep_gamma)
+        elif config.Scheduler.type == 'annealing':
+            lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+                optimizer,
+                T_max=config.Scheduler.annealing_t_max,
+                eta_min=config.Scheduler.annealing_eta_min,
+            )
         else:
             raise ValueError(config.Scheduler.type)
 

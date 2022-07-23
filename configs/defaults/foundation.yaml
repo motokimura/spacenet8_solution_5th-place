@@ -32,6 +32,8 @@ Scheduler:
   type: multistep
   multistep_milestones: [80, 120]
   multistep_gamma: 0.1
+  annealing_t_max: 140
+  annealing_eta_min: 0.0
 General:
   gpus: [0]
   epochs: 140
