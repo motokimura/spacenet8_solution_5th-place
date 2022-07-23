@@ -219,7 +219,7 @@ class Model(pl.LightningModule):
 def load_pretrained_siamese_branch(model, config, pretrained_exp_id):
     assert config.Model.type == 'siamese', config.Model.type
 
-    ckpt_path = os.path.join('/wdata/models', f'exp_{pretrained_exp_id:04d}/best.ckpt')
+    ckpt_path = os.path.join('/wdata/models', f'exp_{pretrained_exp_id:05d}/best.ckpt')
     assert os.path.exists(ckpt_path), ckpt_path
     print(f'loading {ckpt_path}')
 

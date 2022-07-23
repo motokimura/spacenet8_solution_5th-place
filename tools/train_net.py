@@ -80,7 +80,7 @@ def main() -> None:
 
     seed_everything(config.General.seed + config.fold_id * 5555)
 
-    output_dir = '_dry' if args.dry else f'exp_{args.exp_id:04d}'
+    output_dir = '_dry' if args.dry else f'exp_{args.exp_id:05d}'
     output_dir = os.path.join(config.Data.artifact_dir, 'models', output_dir)
     if args.dry:
         shutil.rmtree(output_dir, ignore_errors=True)
