@@ -227,21 +227,21 @@ def load_pretrained_siamese_branch(model, config, pretrained_exp_id):
 
     state_dict = state_dict_orig.copy()
     for k in state_dict_orig:
-        if not k.startswith('model.'):
+        if not k.startswith('model.backbone.'):
             continue
-        if k.startswith('model.segmentation_head.'):
+        if k.startswith('model.backbone.segmentation_head.'):
             del state_dict[k]
             continue
-        state_dict[k.replace('model.', 'model.branch.')] = state_dict_orig[k]
+        state_dict[k.replace('model.backbone.', 'model.branch.')] = state_dict_orig[k]
         del state_dict[k]
 
     imcompatible_keys = model.load_state_dict(state_dict, strict=False)
-    assert len(imcompatible_keys.unexpected_keys) == 0, len(imcompatible_keys.unexpected_keys)
+    assert len(imcompatible_keys.unexpected_keys) == 0, imcompatible_keys.unexpected_keys
 
     expected_missing_keys = []
     for i in range(config.Model.n_siamese_head_convs):
         expected_missing_keys.append(f'model.head.{i}.weight')
         expected_missing_keys.append(f'model.head.{i}.bias')
-    assert imcompatible_keys.missing_keys == expected_missing_keys, (imcompatible_keys.missing_keys, expected_missing_keys)
+    assert set(imcompatible_keys.missing_keys) == set(expected_missing_keys), (imcompatible_keys.missing_keys, expected_missing_keys)
 
     return model

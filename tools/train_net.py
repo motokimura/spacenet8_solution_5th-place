@@ -75,8 +75,11 @@ def main() -> None:
         default_cfg_path,
         [] if args.config is None else [args.config],
         update_dotlist=args.opts,
-        update_dict={'task': args.task, 'exp_id': args.exp_id, 'fold_id': args.fold_id}
-    )
+        update_dict={
+            'task': args.task,
+            'exp_id': args.exp_id,
+            'fold_id': args.fold_id,
+            'pretrained': args.pretrained})
 
     seed_everything(config.General.seed + config.fold_id * 5555)
 
