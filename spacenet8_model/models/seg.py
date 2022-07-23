@@ -1,6 +1,10 @@
 import segmentation_models_pytorch as smp
 import torch
 
+# isort: off
+from spacenet8_model.utils.misc import get_flatten_classes
+# isort: on
+
 
 class SegmentationModel(torch.nn.Module):
     def __init__(self, config, **kwargs):
@@ -11,7 +15,7 @@ class SegmentationModel(torch.nn.Module):
             config.Model.arch,
             encoder_name=config.Model.encoder,
             in_channels=(1 + config.Model.n_input_post_images) * 3,
-            classes=len(config.Model.classes),
+            classes=len(get_flatten_classes(config)),
             encoder_weights="imagenet",
             **kwargs)
 

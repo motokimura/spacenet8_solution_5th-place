@@ -1,6 +1,10 @@
 import segmentation_models_pytorch as smp
 import torch
 
+# isort: off
+from spacenet8_model.utils.misc import get_flatten_classes
+# isort: on
+
 
 class SiameseModel(torch.nn.Module):
     def __init__(self, config, **kwargs):
@@ -9,11 +13,12 @@ class SiameseModel(torch.nn.Module):
         super().__init__()
 
         # siamese branch
+        n_classes = len(get_flatten_classes(config))
         self.branch = smp.create_model(
             config.Model.arch,
             encoder_name=config.Model.encoder,
             in_channels=3,
-            classes=len(config.Model.classes),
+            classes=n_classes,
             encoder_weights="imagenet",
             **kwargs)
 
@@ -33,7 +38,7 @@ class SiameseModel(torch.nn.Module):
         head.append(
             torch.nn.Conv2d(
                 head_in_channels,
-                len(config.Model.classes),
+                n_classes,
                 kernel_size=1,
                 stride=1,
                 padding=0
