@@ -12,14 +12,14 @@ from spacenet8_model.models.siamese import SiameseModel
 # isort: on
 
 
-def get_model(config: DictConfig) -> torch.nn.Module:
+def get_model(config: DictConfig, pretrained_exp_id: int = -1) -> torch.nn.Module:
     kwargs = {
         # TODO: map config parameters to kwargs based on the architecture
     }
     model = Model(config, **kwargs)
 
-    if config.Model.pretrained_siamese_branch_exp_id >= 0:
-        model = load_pretrained_siamese_branch(config, model)
+    if pretrained_exp_id >= 0:
+        model = load_pretrained_siamese_branch(model, config, pretrained_exp_id)
 
     return model
 
@@ -222,10 +222,10 @@ class Model(pl.LightningModule):
         }
 
 
-def load_pretrained_siamese_branch(config, model):
+def load_pretrained_siamese_branch(model, config, pretrained_exp_id):
     assert config.Model.type == 'siamese', config.Model.type
 
-    ckpt_path = os.path.join('/wdata/models', f'exp_{config.Model.pretrained_siamese_branch_exp_id:04d}/best.ckpt')
+    ckpt_path = os.path.join('/wdata/models', f'exp_{pretrained_exp_id:04d}/best.ckpt')
     assert os.path.exists(ckpt_path), ckpt_path
     print(f'loading {ckpt_path}')
 

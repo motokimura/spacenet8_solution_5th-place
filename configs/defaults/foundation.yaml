@@ -19,7 +19,6 @@ Model:
   classes: [building, building_border, building_contact, road, road_junction]
   n_input_post_images: 0
   n_siamese_head_convs: 2
-  pretrained_siamese_branch_exp_id: -1
 Loss:
   types: [dice, bce]
   weights: [1.0, 1.0]

@@ -33,6 +33,12 @@ def parse_args() -> argparse.Namespace:
         default=0
     )
     parser.add_argument(
+        '--pretrained',
+        type=int,
+        default=-1,
+        help='exp_id of pretrained siamese branch'
+    )
+    parser.add_argument(
         '--config',
         default=None,
         help='YAML config path. This will overwrite `configs/default.yaml`')
@@ -115,7 +121,7 @@ def main() -> None:
         limit_val_batches=2 if args.debug else 1.0,
     )
 
-    model = get_model(config)
+    model = get_model(config, pretrained_exp_id=args.pretrained)
 
     train_dataloader = get_dataloader(config, is_train=True)
     val_dataloader = get_dataloader(config, is_train=False)
