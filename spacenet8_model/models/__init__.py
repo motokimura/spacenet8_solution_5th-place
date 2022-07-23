@@ -8,6 +8,7 @@ from omegaconf import DictConfig
 
 # isort: off
 from spacenet8_model.models.losses import CombinedLoss
+from spacenet8_model.models.seg import SegmentationModel
 from spacenet8_model.models.siamese import SiameseModel
 # isort: on
 
@@ -32,13 +33,7 @@ class Model(pl.LightningModule):
         super().__init__()
 
         if config.Model.type == 'seg':
-            self.model = smp.create_model(
-                config.Model.arch,
-                encoder_name=config.Model.encoder,
-                in_channels=(1 + config.Model.n_input_post_images) * 3,
-                classes=len(config.Model.classes),
-                encoder_weights="imagenet",
-                **kwargs)
+            self.model = SegmentationModel(config, **kwargs)
         elif config.Model.type == 'siamese':
             self.model = SiameseModel(config, **kwargs)
 
@@ -83,7 +78,7 @@ class Model(pl.LightningModule):
                 image = torch.cat([image, image_post_a], axis=1)
             elif n_input_post_images == 2:
                 image = torch.cat([image, image_post_a, image_post_b], axis=1)
-            return {'x': image}
+            return {'image': image}
         elif self.config.Model.type == 'siamese':
             if n_input_post_images == 1:
                 images_post = [image_post_a]
