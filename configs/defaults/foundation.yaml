@@ -16,12 +16,12 @@ Model:
   type: seg
   arch: unet
   encoder: timm-efficientnet-b3
-  classes: [building, building_border, building_contact, 'road', 'road_junction']
+  classes: [building, building_border, building_contact, road, road_junction]
   n_input_post_images: 0
   n_siamese_head_convs: 2
   pretrained_siamese_branch_exp_id: -1
 Loss:
-  types: ['dice', 'bce']
+  types: [dice, bce]
   weights: [1.0, 1.0]
   class_weights: [1.0, 1.0, 1.0, 1.0, 1.0]
 Optimizer:
@@ -43,3 +43,4 @@ General:
   seed: 777
   deterministic: true
   benchmark: false
+  check_val_every_n_epoch: 1

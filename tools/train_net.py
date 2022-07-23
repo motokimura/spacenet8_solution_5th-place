@@ -107,6 +107,7 @@ def main() -> None:
         amp_level=config.General.amp_level,
         deterministic=config.General.deterministic,
         benchmark=config.General.benchmark,
+        check_val_every_n_epoch=config.General.check_val_every_n_epoch,
         auto_select_gpus=False,
         default_root_dir=os.getcwd(),
         gpus=config.General.gpus,
