@@ -16,13 +16,18 @@ Model:
   type: seg
   arch: unet
   encoder: timm-efficientnet-b3
-  classes: [road, road_junction]
   n_input_post_images: 0
   n_siamese_head_convs: 2
-Loss:
-  types: [dice, bce]
-  weights: [1.0, 1.0]
-  class_weights: [1.0, 1.0]
+Class:
+  groups: [road]
+  classes:
+    road: [road, road_junction]
+  class_weights:
+    road: [1.0, 1.0]
+  losses:
+    road: [dice, bce]
+  loss_weights:
+    road: [1.0, 1.0]
 Optimizer:
   type: adam
   lr: 2e-4
@@ -42,4 +47,4 @@ General:
   seed: 777
   deterministic: true
   benchmark: false
-  check_val_every_n_epoch: 1
+  check_val_every_n_epoch: 2

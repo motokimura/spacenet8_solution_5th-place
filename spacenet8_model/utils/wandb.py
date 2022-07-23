@@ -15,6 +15,6 @@ def get_wandb_logger(config: DictConfig,
          'See ".env.sample" for the file format')
 
     return WandbLogger(
-        project='sn-8',
-        group=f'exp_{exp_id:04d}',
+        project='spacenet-8',
+        group=f'exp_{exp_id:05d}',
         config=OmegaConf.to_container(config, resolve=True))

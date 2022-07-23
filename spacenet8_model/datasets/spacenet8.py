@@ -5,11 +5,16 @@ import pandas as pd
 import torch
 from skimage import io
 
+# isort: off
+from spacenet8_model.utils.misc import get_flatten_classes
+# isort: on
+
 
 class SpaceNet8Dataset(torch.utils.data.Dataset):
     def __init__(self, config, is_train, transform=None):
         self.pre_paths, self.post1_paths, self.post2_paths, self.mask_paths = self.get_file_paths(config, is_train)
-        self.masks_to_load = self.get_mask_types_to_load(config)
+        self.classes = get_flatten_classes(config)
+        self.masks_to_load = self.get_mask_types_to_load(self.classes)
 
         self.config = config
         self.transform = transform
@@ -101,9 +106,9 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
         }
         return pre_paths, post1_paths, post2_paths, mask_paths
 
-    def get_mask_types_to_load(self, config):
+    def get_mask_types_to_load(self, classes):
         mask_types = []
-        cs = config.Model.classes
+        cs = classes
 
         if ('building' in cs) or ('building_border' in cs) or ('building_contact' in cs):
             mask_types.append('building_3channel')
@@ -126,7 +131,7 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
 
     def prepare_target_mask(self, masks):
         target_mask = []
-        for c in self.config.Model.classes:
+        for c in self.classes:
             # building
             if c == 'building':
                 target_mask.append((masks['building_3channel'][:, :, 0] > 0).astype(np.float32))

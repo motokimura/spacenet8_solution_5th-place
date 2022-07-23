@@ -16,13 +16,18 @@ Model:
   type: seg
   arch: unet
   encoder: timm-efficientnet-b3
-  classes: [building, building_border, building_contact]
   n_input_post_images: 0
   n_siamese_head_convs: 2
-Loss:
-  types: [dice, bce]
-  weights: [1.0, 1.0]
-  class_weights: [1.0, 1.0, 1.0]
+Class:
+  groups: [building]
+  classes:
+    building: [building, building_border, building_contact]
+  class_weights:
+    building: [1.0, 1.0, 1.0]
+  losses:
+    building: [dice, bce]
+  loss_weights:
+    building: [1.0, 1.0]
 Optimizer:
   type: adam
   lr: 2e-4
@@ -42,4 +47,4 @@ General:
   seed: 777
   deterministic: true
   benchmark: false
-  check_val_every_n_epoch: 1
+  check_val_every_n_epoch: 2

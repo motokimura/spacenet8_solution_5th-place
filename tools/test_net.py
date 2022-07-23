@@ -50,7 +50,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_test_config(args):
-    config_exp_path = os.path.join(args.artifact_dir, f'models/exp_{args.exp_id:04d}/config.yaml')
+    config_exp_path = os.path.join(args.artifact_dir, f'models/exp_{args.exp_id:05d}/config.yaml')
     config_exp: DictConfig = OmegaConf.load(config_exp_path)
     task: str = config_exp.task
 
@@ -100,13 +100,13 @@ def main():
     config: DictConfig = load_test_config(args)
 
     model = get_model(config)
-    ckpt_path = os.path.join(args.artifact_dir, f'models/exp_{args.exp_id:04d}/best.ckpt')
+    ckpt_path = os.path.join(args.artifact_dir, f'models/exp_{args.exp_id:05d}/best.ckpt')
     model.load_state_dict(torch.load(ckpt_path, map_location=torch.device('cpu'))['state_dict'])
     model.to(args.device)
     model.eval()
 
     out_root = 'val_preds' if args.val else 'preds'
-    out_root = os.path.join(args.out_dir, out_root, f'exp_{args.exp_id:04d}')
+    out_root = os.path.join(args.out_dir, out_root, f'exp_{args.exp_id:05d}')
     print(f'will save prediction results under {out_root}')
 
     test_dataloader = get_test_dataloader(config, test_to_val=args.val)

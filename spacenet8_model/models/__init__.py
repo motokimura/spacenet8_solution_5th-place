@@ -7,8 +7,10 @@ import torch
 from omegaconf import DictConfig
 
 # isort: off
-from spacenet8_model.models.losses import CombinedLoss
+from spacenet8_model.models.losses import Loss
+from spacenet8_model.models.seg import SegmentationModel
 from spacenet8_model.models.siamese import SiameseModel
+from spacenet8_model.utils.misc import get_flatten_classes
 # isort: on
 
 
@@ -32,13 +34,7 @@ class Model(pl.LightningModule):
         super().__init__()
 
         if config.Model.type == 'seg':
-            self.model = smp.create_model(
-                config.Model.arch,
-                encoder_name=config.Model.encoder,
-                in_channels=(1 + config.Model.n_input_post_images) * 3,
-                classes=len(config.Model.classes),
-                encoder_weights="imagenet",
-                **kwargs)
+            self.model = SegmentationModel(config, **kwargs)
         elif config.Model.type == 'siamese':
             self.model = SiameseModel(config, **kwargs)
 
@@ -49,7 +45,7 @@ class Model(pl.LightningModule):
         self.register_buffer('mean',
                              torch.tensor(params['mean']).view(1, 3, 1, 1))
 
-        self.loss_fn = CombinedLoss(config)
+        self.loss_fn = Loss(config)
         self.config = config
 
     def forward(self, image, image_post_a=None, image_post_b=None):
@@ -83,7 +79,7 @@ class Model(pl.LightningModule):
                 image = torch.cat([image, image_post_a], axis=1)
             elif n_input_post_images == 2:
                 image = torch.cat([image, image_post_a, image_post_b], axis=1)
-            return {'x': image}
+            return {'image': image}
         elif self.config.Model.type == 'siamese':
             if n_input_post_images == 1:
                 images_post = [image_post_a]
@@ -134,12 +130,11 @@ class Model(pl.LightningModule):
         return metrics
 
     def shared_epoch_end(self, outputs, split):
-        prefix = f'{split}'
         # loss
-        losses = self.aggregate_loss(outputs, prefix=prefix)
+        losses = self.aggregate_loss(outputs, prefix=f'{split}/loss')
         # iou
-        ious = self.aggregate_iou(outputs, reduction='macro', prefix=f'{prefix}/iou')
-        ious_iw = self.aggregate_iou(outputs, reduction='macro-imagewise', prefix=f'{prefix}/iou_imagewise')
+        ious = self.aggregate_iou(outputs, reduction='macro', prefix=f'{split}/iou')
+        ious_iw = self.aggregate_iou(outputs, reduction='macro-imagewise', prefix=f'{split}/iou_imagewise')
 
         metrics = {}
         metrics.update(losses)
@@ -159,7 +154,7 @@ class Model(pl.LightningModule):
         for k in losses:
             losses[k] = torch.stack(losses[k]).mean()
 
-        losses[f'{prefix}/loss'] = loss
+        losses[prefix] = loss
 
         return losses
 
@@ -171,7 +166,7 @@ class Model(pl.LightningModule):
         tn = torch.cat([x['tn'] for x in outputs])
 
         ious = {}
-        for i, class_name in enumerate(self.config.Model.classes):
+        for i, class_name in enumerate(get_flatten_classes(self.config)):
             ious[f'{prefix}/{class_name}'] = smp.metrics.iou_score(
                 tp[:, i], fp[:, i], fn[:, i], tn[:, i], reduction=reduction)
         iou = torch.stack([v for v in ious.values()]).mean()
@@ -224,7 +219,7 @@ class Model(pl.LightningModule):
 def load_pretrained_siamese_branch(model, config, pretrained_exp_id):
     assert config.Model.type == 'siamese', config.Model.type
 
-    ckpt_path = os.path.join('/wdata/models', f'exp_{pretrained_exp_id:04d}/best.ckpt')
+    ckpt_path = os.path.join('/wdata/models', f'exp_{pretrained_exp_id:05d}/best.ckpt')
     assert os.path.exists(ckpt_path), ckpt_path
     print(f'loading {ckpt_path}')
 
