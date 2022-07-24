@@ -34,7 +34,7 @@ Class:
     road: [1.0, 1.0]
 Optimizer:
   type: adam
-  lr: 2e-4
+  lr: 1e-4  # 2e-4 might be better if train from scratch
   weight_decay: 0
 Scheduler:
   type: multistep
@@ -51,4 +51,4 @@ General:
   seed: 777
   deterministic: true
   benchmark: false
-  check_val_every_n_epoch: 2
+  check_val_every_n_epoch: 1

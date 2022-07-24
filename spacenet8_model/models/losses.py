@@ -1,8 +1,5 @@
-from collections import defaultdict
-
 import segmentation_models_pytorch as smp
 import torch
-from pydantic import confloat
 from torch.nn.modules.loss import _Loss
 
 
@@ -58,6 +55,10 @@ class _CombinedLoss(_Loss):
                 self.loss_fns.append(_DiceLoss(class_weights))
             elif loss == 'bce':
                 self.loss_fns.append(_BCELoss(class_weights))
+            elif loss == 'ce':
+                self.loss_fns.append(
+                    torch.nn.CrossEntropyLoss(weight=torch.Tensor(class_weights)).cuda()  # TODO: cuda()?
+                )
             else:
                 raise ValueError(loss)
 
@@ -75,33 +76,35 @@ class _CombinedLoss(_Loss):
         return loss, losses
 
 
-class _DiceLoss(_Loss):
+class _BinaryLossBase(_Loss):
+    def __init__(self):
+        super().__init__()
+        self.loss_fn = None
+        self.class_weights = None
+
+    def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor):
+        if self.loss_fn is None:
+            raise NotImplementedError()
+        if self.class_weights is None:
+            raise NotImplementedError()
+
+        assert y_pred.shape[1] == len(self.class_weights)
+        assert y_true.shape[1] == len(self.class_weights)
+        loss = 0
+        for i, weight in enumerate(self.class_weights):
+            loss += weight * self.loss_fn(y_pred[:, i], y_true[:, i])
+        return loss
+
+
+class _DiceLoss(_BinaryLossBase):
     def __init__(self, class_weights):
         super().__init__()
-
         self.loss_fn = smp.losses.DiceLoss(smp.losses.MULTILABEL_MODE, from_logits=True)
         self.class_weights = class_weights
 
-    def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor):
-        assert y_pred.shape[1] == len(self.class_weights)
-        assert y_true.shape[1] == len(self.class_weights)
-        loss = 0
-        for i, weight in enumerate(self.class_weights):
-            loss += weight * self.loss_fn(y_pred[:, i], y_true[:, i])
-        return loss
 
-
-class _BCELoss(_Loss):
+class _BCELoss(_BinaryLossBase):
     def __init__(self, class_weights):
         super().__init__()
-
         self.loss_fn = smp.losses.SoftBCEWithLogitsLoss()
         self.class_weights = class_weights
-
-    def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor):
-        assert y_pred.shape[1] == len(self.class_weights)
-        assert y_true.shape[1] == len(self.class_weights)
-        loss = 0
-        for i, weight in enumerate(self.class_weights):
-            loss += weight * self.loss_fn(y_pred[:, i], y_true[:, i])
-        return loss
