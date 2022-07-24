@@ -9,8 +9,18 @@ def get_transforms(config, is_train):
                 height=config.Transform.train_random_crop_size[1],
                 always_apply=True),
         ]
+        # flip
         if config.Transform.train_random_flip_prob > 0:
             transforms.append(albu.Flip(p=config.Transform.train_random_flip_prob))
+        # horizontal flip
+        if config.Transform.train_random_horizontal_flip_prob > 0:
+            transforms.append(albu.HorizontalFlip(p=config.Transform.train_random_horizontal_flip_prob))
+        # vertical flip
+        if config.Transform.train_random_vertical_flip_prob > 0:
+            transforms.append(albu.VerticalFlip(p=config.Transform.train_random_vertical_flip_prob))
+        # rotate90
+        if config.Transform.train_random_rotate90_prob > 0:
+            transforms.append(albu.RandomRotate90(p=config.Transform.train_random_rotate90_prob))
     else:
         transforms = [
             albu.PadIfNeeded(

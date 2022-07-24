@@ -11,7 +11,10 @@ Dataloader:
   test_num_workers: 6
 Transform:
   train_random_crop_size: [352, 352]
-  train_random_flip_prob: 0.0  # both of left-right and top-bottom
+  train_random_flip_prob: 0.0  # both of horizontal and vertical flip
+  train_random_horizontal_flip_prob: 0.0
+  train_random_vertical_flip_prob: 0.0
+  train_random_rotate90_prob: 0.0
 Model:
   type: siamese
   arch: unet
