@@ -27,11 +27,11 @@ Class:
     building: [1.0, 1.0]
     road: [1.0, 1.0]
   losses:
-    building: [dice, bce]
-    road:  [dice, bce]
+    building: [dice, bce, ce]
+    road:  [dice, bce, ce]
   loss_weights:
-    building: [1.0, 1.0]
-    road: [1.0, 1.0]
+    building: [1.0, 1.0, 1.0]
+    road: [1.0, 1.0, 1.0]
 Optimizer:
   type: adam
   lr: 1e-4  # 2e-4 might be better if train from scratch
