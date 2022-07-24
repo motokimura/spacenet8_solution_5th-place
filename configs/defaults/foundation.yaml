@@ -51,4 +51,4 @@ General:
   seed: 777
   deterministic: true
   benchmark: false
-  check_val_every_n_epoch: 2
+  check_val_every_n_epoch: 1
