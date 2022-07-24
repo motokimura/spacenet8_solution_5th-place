@@ -27,7 +27,7 @@ class SiameseModel(torch.nn.Module):
 
         # siamese head
         head_in_channels = branch_out_channels * (1 + config.Model.n_input_post_images)
-        assert config.Model.n_siamese_head_convs > 1
+        assert config.Model.n_siamese_head_convs >= 1
         head = [torch.nn.Conv2d(
                     head_in_channels,
                     head_in_channels,
