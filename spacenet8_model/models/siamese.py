@@ -1,5 +1,6 @@
 import segmentation_models_pytorch as smp
 import torch
+from segmentation_models_pytorch.base import modules as md
 
 # isort: off
 from spacenet8_model.utils.misc import get_flatten_classes
@@ -27,14 +28,15 @@ class SiameseModel(torch.nn.Module):
 
         # siamese head
         head_in_channels = branch_out_channels * (1 + config.Model.n_input_post_images)
-        assert config.Model.n_siamese_head_convs > 1
-        head = [torch.nn.Conv2d(
-                    head_in_channels,
-                    head_in_channels,
-                    kernel_size=3,
-                    stride=1,
-                    padding=1) for _ in range(config.Model.n_siamese_head_convs - 1)
-                ]
+        assert config.Model.n_siamese_head_convs >= 1
+        head = [md.Conv2dReLU(
+            head_in_channels,
+            head_in_channels,
+            kernel_size=3,
+            padding=1,
+            stride=1,
+            use_batchnorm=True) for _ in range(config.Model.n_siamese_head_convs - 1)
+        ]
         head.append(
             torch.nn.Conv2d(
                 head_in_channels,

@@ -239,9 +239,17 @@ def load_pretrained_siamese_branch(model, config, pretrained_exp_id):
     assert len(imcompatible_keys.unexpected_keys) == 0, imcompatible_keys.unexpected_keys
 
     expected_missing_keys = []
-    for i in range(config.Model.n_siamese_head_convs):
-        expected_missing_keys.append(f'model.head.{i}.weight')
-        expected_missing_keys.append(f'model.head.{i}.bias')
+    for i in range(config.Model.n_siamese_head_convs - 1):
+        # conv
+        expected_missing_keys.append(f'model.head.{i}.0.weight')
+        # bn
+        expected_missing_keys.append(f'model.head.{i}.1.weight')
+        expected_missing_keys.append(f'model.head.{i}.1.bias')
+        expected_missing_keys.append(f'model.head.{i}.1.running_mean')
+        expected_missing_keys.append(f'model.head.{i}.1.running_var')
+    # final conv
+    expected_missing_keys.append(f'model.head.{config.Model.n_siamese_head_convs - 1}.weight')
+    expected_missing_keys.append(f'model.head.{config.Model.n_siamese_head_convs - 1}.bias')
     assert set(imcompatible_keys.missing_keys) == set(expected_missing_keys), (imcompatible_keys.missing_keys, expected_missing_keys)
 
     return model
