@@ -10,7 +10,7 @@ from sklearn.utils import shuffle
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_dir', default='/data/train')
-    parser.add_argument('--out_dir', default='/wdata/folds')
+    parser.add_argument('--out_dir', default='/wdata/folds_v1')
     parser.add_argument('--n_folds', type=int, default=5)
     parser.add_argument('--seed', type=int, default=777)
     return parser.parse_args()

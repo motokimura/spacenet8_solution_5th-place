@@ -53,7 +53,7 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
     def get_file_paths(self, config, is_train):
         split = 'train' if is_train else 'val'
         path = os.path.join(config.Data.artifact_dir,
-                            'folds',
+                            config.Data.fold_ver,
                             f'{split}_{config.fold_id}.csv')
         df = pd.read_csv(path)
 
@@ -237,7 +237,7 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
 
     def get_file_paths(self, config, test_to_val=False):
         if test_to_val:
-            csv_path = os.path.join(config.Data.artifact_dir, f'folds/val_{config.fold_id}.csv')
+            csv_path = os.path.join(config.Data.artifact_dir, f'{config.Data.fold_ver}/val_{config.fold_id}.csv')
             data_root = config.Data.train_dir
             post_image_dir = os.path.join(config.Data.artifact_dir, 'warped_posts_train')
         else:

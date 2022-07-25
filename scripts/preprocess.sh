@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python tools/make_folds.py
+python tools/make_folds_v1.py
 python tools/make_test_csv.py
 python tools/prepare_building_masks.py
 python tools/prepare_road_masks.py

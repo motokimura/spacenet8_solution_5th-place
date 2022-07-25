@@ -2,6 +2,7 @@ Data:
   train_dir: /data/train
   test_dir: /data/test
   artifact_dir: /wdata
+  fold_ver: folds_v1
 Dataloader:
   train_batch_size: 10
   train_num_workers: 6
