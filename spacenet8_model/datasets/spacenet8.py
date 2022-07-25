@@ -123,42 +123,49 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
         return mask_types
 
     def load_mask(self, idx):
+        # load mask images
         masks = {}
         for mask_type in self.masks_to_load:
             masks[mask_type] = io.imread(self.mask_paths[mask_type][idx])
-        target_mask = self.prepare_target_mask(masks)
-        return target_mask
 
-    def prepare_target_mask(self, masks):
+        # prepare multi-channel mask
         target_mask = []
         for c in self.classes:
-            # building
-            if c == 'building':
-                target_mask.append((masks['building_3channel'][:, :, 0] > 0).astype(np.float32))
-            elif c == 'building_border':
-                target_mask.append((masks['building_3channel'][:, :, 1] > 0).astype(np.float32))
-            elif c == 'building_contact':
-                target_mask.append((masks['building_3channel'][:, :, 2] > 0).astype(np.float32))
-            # road
-            elif c == 'road':
-                target_mask.append(((masks['road'][:, :, 0] + masks['road'][:, :, 1]) > 0).astype(np.float32))
-            elif c == 'road_junction':
-                target_mask.append((masks['road'][:, :, 2] > 0).astype(np.float32))
-            # flood
-            elif c == 'flood':
-                target_mask.append(((masks['building_flood'][:, :, 0] + masks['road'][:, :, 0]) > 0).astype(np.float32))
-            elif c == 'flood_building':
-                target_mask.append((masks['building_flood'][:, :, 0] > 0).astype(np.float32))
-            elif c == 'flood_road':
-                target_mask.append((masks['road'][:, :, 0] > 0).astype(np.float32))
-            elif c == 'not_flood_building':
-                target_mask.append((masks['building_flood'][:, :, 1] > 0).astype(np.float32))
-            elif c == 'not_flood_road':
-                target_mask.append((masks['road'][:, :, 1] > 0).astype(np.float32))
-            else:
-                raise ValueError(c)
+            target_mask.append(
+                self.prepare_binary_mask(masks, class_name=c)
+            )
         target_mask = np.stack(target_mask)  # CHW
         return target_mask.transpose(1, 2, 0)  # HWC
+
+    def prepare_binary_mask(self, masks, class_name):
+        c = class_name
+        # building
+        if c == 'building':
+            mask = masks['building_3channel'][:, :, 0]
+        elif c == 'building_border':
+            mask = masks['building_3channel'][:, :, 1]
+        elif c == 'building_contact':
+            mask = masks['building_3channel'][:, :, 2]
+        # road
+        elif c == 'road':
+            mask = masks['road'][:, :, 0] + masks['road'][:, :, 1]
+        elif c == 'road_junction':
+            mask = masks['road'][:, :, 2]
+        # flood
+        elif c == 'flood':
+            mask = masks['building_flood'][:, :, 0] + masks['road'][:, :, 0]
+        elif c == 'flood_building':
+            mask = masks['building_flood'][:, :, 0]
+        elif c == 'flood_road':
+            mask = masks['road'][:, :, 0]
+        elif c == 'not_flood_building':
+            mask = masks['building_flood'][:, :, 1]
+        elif c == 'not_flood_road':
+            mask = masks['road'][:, :, 1]
+        else:
+            raise ValueError(class_name)
+
+        return (mask > 0).astype(np.float32)
 
     def load_post_images(self, idx):
         return load_post_images(
