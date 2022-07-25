@@ -1,6 +1,3 @@
-from tokenize import group
-
-
 def get_flatten_classes(config):
     groups = config.Class.groups
     classes = config.Class.classes
