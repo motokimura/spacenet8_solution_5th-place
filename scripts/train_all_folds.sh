@@ -1,5 +1,5 @@
 #!/bin/bash
-# example usage: ./scripts/train_all_folds.sh building 0 --config path/to/config General.seed=1000
+# example usage: ./scripts/train_all_folds.sh foundation 0 --config path/to/config General.seed=1000
 
 TASK=$1
 EXP_ID=$2
