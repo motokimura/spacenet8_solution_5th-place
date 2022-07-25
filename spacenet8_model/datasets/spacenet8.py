@@ -13,8 +13,7 @@ from spacenet8_model.utils.misc import get_flatten_classes
 class SpaceNet8Dataset(torch.utils.data.Dataset):
     def __init__(self, config, is_train, transform=None):
         self.pre_paths, self.post1_paths, self.post2_paths, self.mask_paths = self.get_file_paths(config, is_train)
-        self.classes = get_flatten_classes(config)
-        self.masks_to_load = self.get_mask_types_to_load(self.classes)
+        self.masks_to_load = self.get_mask_types_to_load(config)
 
         self.config = config
         self.transform = transform
@@ -106,9 +105,9 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
         }
         return pre_paths, post1_paths, post2_paths, mask_paths
 
-    def get_mask_types_to_load(self, classes):
+    def get_mask_types_to_load(self, config):
         mask_types = []
-        cs = classes
+        cs = get_flatten_classes(config)
 
         if ('building' in cs) or ('building_border' in cs) or ('building_contact' in cs):
             mask_types.append('building_3channel')
@@ -128,14 +127,35 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
         for mask_type in self.masks_to_load:
             masks[mask_type] = io.imread(self.mask_paths[mask_type][idx])
 
-        # prepare multi-channel mask
+        # prepare target mask
         target_mask = []
-        for c in self.classes:
-            target_mask.append(
-                self.prepare_binary_mask(masks, class_name=c)
+        for g in self.config.Class.groups:
+            target_mask.extend(
+                self.prepare_multichannel_mask(masks, class_names=list(self.config.Class.classes[g]))
             )
         target_mask = np.stack(target_mask)  # CHW
         return target_mask.transpose(1, 2, 0)  # HWC
+
+    def prepare_multichannel_mask(self, masks, class_names):
+        assert len(class_names) == len(set(class_names)), class_names
+
+        if '_background' in class_names:
+            assert class_names.index('_background') == len(class_names) - 1, class_names
+            class_names.remove('_background')
+            assert len(class_names) > 0, class_names
+            use_background = True
+        else:
+            use_background = False
+
+        target_mask = []
+        for c in class_names:
+            target_mask.append(self.prepare_binary_mask(masks, class_name=c))
+
+        if use_background:
+            background_mask = (np.stack(target_mask).sum(axis=0) == 0).astype(np.float32)
+            target_mask.append(background_mask)
+
+        return target_mask
 
     def prepare_binary_mask(self, masks, class_name):
         c = class_name

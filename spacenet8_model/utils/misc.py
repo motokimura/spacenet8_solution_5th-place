@@ -11,5 +11,4 @@ def get_flatten_classes(config):
     classes_flatten = []
     for g in groups:
         classes_flatten.extend(classes[g])
-    assert len(classes_flatten) == len(set(classes_flatten)), classes_flatten
     return classes_flatten
