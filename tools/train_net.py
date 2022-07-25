@@ -19,7 +19,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--task',
-        choices=['foundation', 'building', 'road', 'flood'],
+        choices=['foundation', 'flood'],
         required=True
     )
     parser.add_argument(
@@ -57,10 +57,6 @@ def parse_args() -> argparse.Namespace:
 def get_default_cfg_path(task: str) -> str:
     if task == 'foundation':
         return 'configs/defaults/foundation.yaml'
-    elif task == 'building':
-        return 'configs/defaults/foundation_building.yaml'
-    elif task == 'road':
-        return 'configs/defaults/foundation_road.yaml'
     elif task == 'flood':
         return 'configs/defaults/flood.yaml'
     else:
