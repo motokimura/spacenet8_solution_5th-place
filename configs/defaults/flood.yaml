@@ -42,13 +42,13 @@ Optimizer:
   weight_decay: 0
 Scheduler:
   type: multistep
-  multistep_milestones: [80, 120]
+  multistep_milestones: [80]
   multistep_gamma: 0.1
   annealing_t_max: 140
   annealing_eta_min: 0.0
 General:
   gpus: [0]
-  epochs: 140
+  epochs: 120
   fp16: true
   amp_backend: native # valid when fp16=true
   amp_level: null # valid when amp_backend=apex
