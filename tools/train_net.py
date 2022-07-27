@@ -84,7 +84,7 @@ def main() -> None:
     if args.dry:
         shutil.rmtree(output_dir, ignore_errors=True)
     os.makedirs(output_dir, exist_ok=False)
-    print(f'will save training results under {output_dir}')
+    print(f'going to save training results under {output_dir}')
 
     OmegaConf.save(config, os.path.join(output_dir, 'config.yaml'))
 

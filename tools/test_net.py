@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 
 import numpy as np
@@ -11,6 +12,7 @@ from tqdm import tqdm
 from spacenet8_model.datasets import get_test_dataloader
 from spacenet8_model.models import get_model
 from spacenet8_model.utils.config import load_config
+from spacenet8_model.utils.misc import save_array_as_geotiff
 from train_net import get_default_cfg_path
 # isort: on
 
@@ -107,7 +109,19 @@ def main():
 
     out_root = 'val_preds' if args.val else 'preds'
     out_root = os.path.join(args.out_dir, out_root, f'exp_{args.exp_id:05d}')
-    print(f'will save prediction results under {out_root}')
+    print(f'going to save prediction results under {out_root}')
+
+    os.makedirs(out_root, exist_ok=True)
+
+    # dump meta
+    meta = {
+        'groups': list(config.Class.groups),
+        'classes': {
+            g: list(cs) for g, cs in config.Class.classes.items()
+        }
+    }
+    with open(os.path.join(out_root, 'meta.json'), 'w') as f:
+        json.dump(meta, f)
 
     test_dataloader = get_test_dataloader(config, test_to_val=args.val)
     for batch in tqdm(test_dataloader):
@@ -135,13 +149,16 @@ def main():
             batch_preds, batch_pre_paths, batch_orig_heights, batch_orig_widths):
             pred = crop_center(pred, crop_wh=(orig_w.item(), orig_h.item()))
 
+            assert pred.min() >= 0
+            assert pred.max() <= 1
+            pred_8bit = (pred * 255).astype(np.uint8)
+
             aoi = os.path.basename(os.path.dirname(os.path.dirname(pre_path)))
             filename = os.path.basename(pre_path)
-            filename, _ = os.path.splitext(filename)
-            filename = f'{filename}.png'
             out_dir = os.path.join(out_root, aoi)
             os.makedirs(out_dir, exist_ok=True)
-            dump_pred_to_png(pred, os.path.join(out_dir, filename))
+
+            save_array_as_geotiff(pred_8bit, pre_path, os.path.join(out_dir, filename))
 
 
 if __name__ == '__main__':
