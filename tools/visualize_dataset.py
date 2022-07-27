@@ -14,7 +14,7 @@ from tqdm import tqdm
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--root_dir', default='/data/train')
-    parser.add_argument('--preprocessed_dir', default='/wdata')
+    parser.add_argument('--artifact_dir', default='/wdata')
     parser.add_argument('--out_dir', default='/wdata')
     parser.add_argument('--test', action='store_true')
     return parser.parse_args()
@@ -36,13 +36,13 @@ def load_images(images, args, aoi):
 
     # load post-1 image
     warped_dir = 'warped_posts_test' if args.test else 'warped_posts_train'
-    post1_path = os.path.join(args.preprocessed_dir, warped_dir, aoi, post1)
+    post1_path = os.path.join(args.artifact_dir, warped_dir, aoi, post1)
     assert os.path.exists(post1_path), post1_path
     post1_image = io.imread(post1_path)
 
     # load post-2 image if exists
     if isinstance(post2, str):
-        post2_path = os.path.join(args.preprocessed_dir, warped_dir, aoi, post2)
+        post2_path = os.path.join(args.artifact_dir, warped_dir, aoi, post2)
         assert os.path.exists(post2_path), post2_path
         post2_image = io.imread(post2_path)
     else:
@@ -56,17 +56,17 @@ def load_masks(images, args, aoi):
     image_id, _ = os.path.splitext(pre)
 
     # load building 3-channel mask
-    building_3channel_dir = os.path.join(args.preprocessed_dir, 'masks_building_3channel', aoi)
+    building_3channel_dir = os.path.join(args.artifact_dir, 'masks_building_3channel', aoi)
     building_3channel_path = os.path.join(building_3channel_dir, f'{image_id}.png')
     building_3channel = io.imread(building_3channel_path)
 
     # load building flood mask
-    building_flood_dir = os.path.join(args.preprocessed_dir, 'masks_building_flood', aoi)
+    building_flood_dir = os.path.join(args.artifact_dir, 'masks_building_flood', aoi)
     building_flood_path = os.path.join(building_flood_dir, f'{image_id}.png')
     building_flood = io.imread(building_flood_path)
 
     # load road mask
-    road_dir = os.path.join(args.preprocessed_dir, 'masks_road', aoi)
+    road_dir = os.path.join(args.artifact_dir, 'masks_road', aoi)
     road_path = os.path.join(road_dir, f'{image_id}.png')
     road = io.imread(road_path)
 
