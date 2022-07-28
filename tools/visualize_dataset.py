@@ -1,6 +1,5 @@
 import argparse
 import os
-from distutils.command.build import build
 from functools import partial
 from glob import glob
 from multiprocessing.pool import Pool

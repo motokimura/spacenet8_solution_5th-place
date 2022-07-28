@@ -2,7 +2,6 @@ import argparse
 import os
 from glob import glob
 
-import numpy as np
 import pandas as pd
 from sklearn.utils import shuffle
 
