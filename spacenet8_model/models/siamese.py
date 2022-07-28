@@ -27,13 +27,15 @@ class SiameseModel(torch.nn.Module):
 
         # siamese head
         head_in_channels = branch_out_channels * (1 + config.Model.n_input_post_images)
+        kernel_size = config.Model.siamese_head_kernel_size
+        padding = (kernel_size - 1) // 2
         assert config.Model.n_siamese_head_convs >= 1
         head = [torch.nn.Conv2d(
                     head_in_channels,
                     head_in_channels,
-                    kernel_size=3,
+                    kernel_size=kernel_size,
                     stride=1,
-                    padding=1) for _ in range(config.Model.n_siamese_head_convs - 1)
+                    padding=padding) for _ in range(config.Model.n_siamese_head_convs - 1)
                 ]
         head.append(
             torch.nn.Conv2d(

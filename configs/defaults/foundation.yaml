@@ -33,6 +33,7 @@ Model:
   encoder: timm-efficientnet-b3
   n_input_post_images: 0
   n_siamese_head_convs: 2
+  siamese_head_kernel_size: 3
 Class:
   groups: [building, road]
   classes:
