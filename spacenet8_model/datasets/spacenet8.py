@@ -67,7 +67,12 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
         for i, row in df.iterrows():
             aoi = row['aoi']
 
-            pre = os.path.join(config.Data.train_dir, aoi, 'PRE-event', row['pre-event image'])
+            pre_fn = row['pre-event image']
+            if pre_fn in config.Data.pre_image_blacklist:
+                print(f'removed {pre_fn} from {"train set" if is_train else "val set"}')
+                continue
+
+            pre = os.path.join(config.Data.train_dir, aoi, 'PRE-event', pre_fn)
             assert os.path.exists(pre), pre
             pre_paths.append(pre)
 
@@ -83,7 +88,7 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
                 post2 = None
             post2_paths.append(post2)
 
-            mask_filename, _ = os.path.splitext(row['pre-event image'])
+            mask_filename, _ = os.path.splitext(pre_fn)
             mask_filename = f'{mask_filename}.png'
 
             building_3channel = os.path.join(config.Data.artifact_dir, 'masks_building_3channel', aoi, mask_filename)

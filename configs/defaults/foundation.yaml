@@ -2,7 +2,18 @@ Data:
   train_dir: /data/train
   test_dir: /data/test
   artifact_dir: /wdata
-  fold_ver: folds_v1
+  fold_ver: folds_v3
+  pre_image_blacklist: [
+    # Louisiana-East_Training_Public
+    10300100AF395C00_2_18_35.tif,  # building FN
+    10300100AF395C00_2_19_35.tif,  # building FN
+    10400100684A4B00_1_22_70.tif,  # building FN
+    10400100684A4B00_1_23_70.tif,  # building FN
+    10400100684A4B00_1_24_70.tif,  # building FN
+    10400100684A4B00_1_25_70.tif,  # building FN
+    10400100684A4B00_1_26_70.tif,  # building FN
+    #10400100684A4B00_1_2_84.tif,  # building FN
+  ]
 Dataloader:
   train_batch_size: 10
   train_num_workers: 6
