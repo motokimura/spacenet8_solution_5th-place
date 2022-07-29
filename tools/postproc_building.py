@@ -102,13 +102,16 @@ def postprocess(pre_image_fn, args, aoi):
     rows = []
     if len(feats) == 0: # no buildings detecting in the tile, write no prediction to submission
         # ['ImageId', 'Object', 'Wkt_Pix', 'Flooded', 'length_m', 'travel_time_s']
-        rows.append([image_id, 'Building', 'POLYGON EMPTY', 'Null', 'Null', 'Null'])
+        rows.append([image_id, 'Building', 'POLYGON EMPTY', 'False', 'Null', 'Null'])
     else:
         for f in feats:
             wkt_image_coords = geo_coords_to_image_coords(geotran, f['geometry'])
             flood_val = 'True' if f['properties']['mask_val'] == flooded_building_label else 'False'
             # ['ImageId', 'Object', 'Wkt_Pix', 'Flooded', 'length_m', 'travel_time_s']
             rows.append([image_id, 'Building', wkt_image_coords, flood_val, 'Null', 'Null'])
+
+    # submit without any road prediction
+    # rows.append([image_id, 'Road', 'LINESTRING EMPTY', 'False', 'Null', 'Null'])
     
     return rows
 
@@ -141,8 +144,8 @@ def main():
     df = pd.DataFrame(rows, columns=cols)
     print(df.head(15))
 
-    exp_foundation = os.path.basename(args.foundation).replace('exp_', '')
-    exp_flood = os.path.basename(args.foundation).replace('exp_', '')
+    exp_foundation = os.path.basename(os.path.normpath(args.foundation)).replace('exp_', '')
+    exp_flood = os.path.basename(os.path.normpath(args.flood)).replace('exp_', '')
     out_dir = f'exp_{exp_foundation}_{exp_flood}'
     out_dir = os.path.join(args.artifact_dir, 'building_submissions', out_dir)
     os.makedirs(out_dir, exist_ok=True)
