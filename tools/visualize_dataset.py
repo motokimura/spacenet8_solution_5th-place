@@ -14,7 +14,6 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--root_dir', default='/data/train')
     parser.add_argument('--artifact_dir', default='/wdata')
-    parser.add_argument('--out_dir', default='/wdata')
     parser.add_argument('--test', action='store_true')
     return parser.parse_args()
 
@@ -110,7 +109,7 @@ def visualize_image(images, args, aoi, out_dir):
 
 def visualize_aoi(args, aoi):
     vis_dir = 'vis_test' if args.test else 'vis_train'
-    out_dir = os.path.join(args.out_dir, vis_dir, aoi)
+    out_dir = os.path.join(args.artifact_dir, vis_dir, aoi)
     os.makedirs(out_dir, exist_ok=True)
 
     mapping_csv_path = get_mapping_csv(args, aoi)

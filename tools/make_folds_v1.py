@@ -10,7 +10,7 @@ from sklearn.utils import shuffle
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_dir', default='/data/train')
-    parser.add_argument('--out_dir', default='/wdata/folds_v1')
+    parser.add_argument('--artifact_dir', default='/wdata')
     parser.add_argument('--n_folds', type=int, default=5)
     parser.add_argument('--seed', type=int, default=777)
     return parser.parse_args()
@@ -25,7 +25,8 @@ def get_mapping_csv(args, aoi):
 def main():
     args = parse_args()
 
-    os.makedirs(args.out_dir, exist_ok=True)
+    out_dir = os.path.join(args.artifact_dir, 'folds_v1')
+    os.makedirs(out_dir, exist_ok=True)
 
     columns= ['label', 'pre-event image', 'post-event image 1', 'post-event image 2', 'aoi']
     rows_all_folds = [[] for _ in range(args.n_folds)]
@@ -48,7 +49,7 @@ def main():
         val_rows = rows_all_folds[i]
         val_rows = shuffle(val_rows, random_state=args.seed)
         val_df = pd.DataFrame(val_rows, columns=columns)
-        val_df.to_csv(os.path.join(args.out_dir, f'val_{i}.csv'), index=False)
+        val_df.to_csv(os.path.join(out_dir, f'val_{i}.csv'), index=False)
 
         train_mask = np.ones(args.n_folds, dtype=bool)
         train_mask[i] = False
@@ -56,7 +57,7 @@ def main():
         train_rows = np.concatenate(train_rows, axis=0)
         train_rows = shuffle(train_rows, random_state=args.seed)
         train_df = pd.DataFrame(train_rows, columns=columns)
-        train_df.to_csv(os.path.join(args.out_dir, f'train_{i}.csv'), index=False)
+        train_df.to_csv(os.path.join(out_dir, f'train_{i}.csv'), index=False)
 
 
 if __name__ == '__main__':

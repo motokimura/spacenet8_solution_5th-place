@@ -13,7 +13,8 @@ from tqdm import tqdm
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--root_dir', default='/data/train')
-    parser.add_argument('--out_dir', default='/wdata/warped_posts_train')
+    parser.add_argument('--artifact_dir', default='/wdata')
+    parser.add_argument('--test', action='store_true')
     return parser.parse_args()
 
 
@@ -60,7 +61,8 @@ def warp_image(images, args, aoi, out_dir):
 
 
 def warp_images(args, aoi):
-    out_dir = os.path.join(args.out_dir, aoi)
+    out_dir = 'warped_posts_test' if args.test else 'warped_posts_train'
+    out_dir = os.path.join(args.artifact_dir, out_dir, aoi)
     os.makedirs(out_dir, exist_ok=True)
 
     mapping_csv_path = get_mapping_csv(args, aoi)

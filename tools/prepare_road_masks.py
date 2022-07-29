@@ -17,7 +17,7 @@ def parse_args():
     parser.add_argument('--train_dir', default='/data/train')
     parser.add_argument('--road_width', type=int, default=12)
     parser.add_argument('--junction_radius', type=int, default=16)
-    parser.add_argument('--out_dir', default='/wdata')
+    parser.add_argument('--artifact_dir', default='/wdata')
     return parser.parse_args()
 
 
@@ -90,7 +90,7 @@ def prepare_road_mask(image_id, args, aoi, out_dir):
 
 
 def prepare_road_masks(args, aoi):
-    out_dir = os.path.join(args.out_dir, 'masks_road', aoi)
+    out_dir = os.path.join(args.artifact_dir, 'masks_road', aoi)
     os.makedirs(out_dir, exist_ok=True)
 
     gt_csv_path = get_gt_csv(args, aoi)

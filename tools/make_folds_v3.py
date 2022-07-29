@@ -9,7 +9,7 @@ from sklearn.utils import shuffle
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_dir', default='/data/train')
-    parser.add_argument('--out_dir', default='/wdata/folds_v3')
+    parser.add_argument('--artifact_dir', default='/wdata')
     parser.add_argument('--seed', type=int, default=777)
     return parser.parse_args()
 
@@ -23,7 +23,8 @@ def get_mapping_csv(args, aoi):
 def main():
     args = parse_args()
 
-    os.makedirs(args.out_dir, exist_ok=True)
+    out_dir = os.path.join(args.artifact_dir, 'folds_v3')
+    os.makedirs(out_dir, exist_ok=True)
 
     fold_tiles_mapping = {
         0: [
@@ -210,8 +211,8 @@ def main():
         train_df = shuffle(train_df, random_state=args.seed)
         val_df = shuffle(val_df, random_state=args.seed)
 
-        val_df.to_csv(os.path.join(args.out_dir, f'val_{fold_id}.csv'), index=False)
-        train_df.to_csv(os.path.join(args.out_dir, f'train_{fold_id}.csv'), index=False)
+        val_df.to_csv(os.path.join(out_dir, f'val_{fold_id}.csv'), index=False)
+        train_df.to_csv(os.path.join(out_dir, f'train_{fold_id}.csv'), index=False)
 
         print(f'fold={fold_id}, n_val: {len(val_df)}, n_train: {len(train_df)}')
 

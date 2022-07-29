@@ -8,7 +8,7 @@ import pandas as pd
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--test_dir', default='/data/test')
-    parser.add_argument('--out_path', default='/wdata/test.csv')
+    parser.add_argument('--artifact_dir', default='/wdata')
     return parser.parse_args()
 
 
@@ -20,6 +20,8 @@ def get_mapping_csv(args, aoi):
 
 def main():
     args = parse_args()
+
+    out_path = os.path.join(args.artifact_dir, 'test.csv')
 
     columns= ['label', 'pre-event image', 'post-event image 1', 'post-event image 2', 'aoi']
     rows_all_aois = []
@@ -35,7 +37,7 @@ def main():
         rows_all_aois.extend(rows)
 
     train_df = pd.DataFrame(rows_all_aois, columns=columns)
-    train_df.to_csv(args.out_path, index=False)
+    train_df.to_csv(out_path, index=False)
 
 
 if __name__ == '__main__':

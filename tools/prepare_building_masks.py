@@ -19,7 +19,7 @@ def parse_args():
     parser.add_argument('--train_dir', default='/data/train')
     parser.add_argument('--edge_width', type=int, default=3)
     parser.add_argument('--contact_width', type=int, default=9)
-    parser.add_argument('--out_dir', default='/wdata')
+    parser.add_argument('--artifact_dir', default='/wdata')
     return parser.parse_args()
 
 
@@ -98,7 +98,7 @@ def prepare_3channel_mask(image_id, args, aoi, out_dir):
 
 
 def prepare_3channel_masks(args, aoi):
-    out_3channels = os.path.join(args.out_dir, 'masks_building_3channel', aoi)
+    out_3channels = os.path.join(args.artifact_dir, 'masks_building_3channel', aoi)
     os.makedirs(out_3channels, exist_ok=True)
 
     gt_csv_path = get_gt_csv(args, aoi)
@@ -151,7 +151,7 @@ def prepare_flood_mask(image_id, args, aoi, out_dir):
 
 
 def prepare_flood_masks(args, aoi):
-    out_flood = os.path.join(args.out_dir, 'masks_building_flood', aoi)
+    out_flood = os.path.join(args.artifact_dir, 'masks_building_flood', aoi)
     os.makedirs(out_flood, exist_ok=True)
 
     gt_csv_path = get_gt_csv(args, aoi)
