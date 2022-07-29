@@ -12,7 +12,7 @@ from tqdm import tqdm
 from spacenet8_model.datasets import get_test_dataloader
 from spacenet8_model.models import get_model
 from spacenet8_model.utils.config import load_config
-from spacenet8_model.utils.misc import save_array_as_geotiff
+from spacenet8_model.utils.misc import get_flatten_classes, save_array_as_geotiff
 from train_net import get_default_cfg_path
 # isort: on
 
@@ -145,9 +145,31 @@ def main():
         batch_preds = torch.sigmoid(batch_preds)
         batch_preds = batch_preds.cpu().numpy()
 
-        for pred, pre_path, orig_h, orig_w in zip(
-            batch_preds, batch_pre_paths, batch_orig_heights, batch_orig_widths):
-            pred = crop_center(pred, crop_wh=(orig_w.item(), orig_h.item()))
+        for i in range(images.shape[0]):
+            pred = batch_preds[i]
+            pre_path = batch_pre_paths[i]
+            orig_h = batch_orig_heights[i].item()
+            orig_w = batch_orig_widths[i].item()
+
+            # set pred=0 on black pixels in the pre-image
+            image = images[i].cpu().numpy()  # 3,H,W
+            nodata_mask = np.sum(image, axis=0) == 0  # H,W
+            pred[:, nodata_mask] = 0.0
+
+            # set flooded_pred=0 on black pixels in the post-images
+            nodata_mask = np.zeros(shape=[orig_h, orig_w], dtype=bool)
+            if images_post_a is not None:
+                image = images_post_a[i].cpu().numpy()
+                nodata_mask = np.sum(image, axis=0) == 0  # H,W
+            if images_post_b is not None:
+                image = images_post_b[i].cpu().numpy()
+                nodata_mask = nodata_mask & (np.sum(image, axis=0) == 0)  # H,W 
+            classes = get_flatten_classes(config)
+            for class_index, class_name in enumerate(classes):
+                if class_name in ['flood_building', 'flood_road', 'flood']:
+                    pred[class_index, nodata_mask] = 0.0
+
+            pred = crop_center(pred, crop_wh=(orig_w, orig_h))
 
             assert pred.min() >= 0
             assert pred.max() <= 1
