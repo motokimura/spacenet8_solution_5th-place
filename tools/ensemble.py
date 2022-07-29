@@ -45,9 +45,10 @@ def ensemble(pre_image_info, args):
     pre_path = os.path.join(args.root_dir, aoi, 'PRE-event', pre_fn)
     assert os.path.exists(pre_path), pre_path
 
-    exp_dir = 'exp'
+    exp_dir = 'exp_'
     for exp_id in args.exp_id:
-        exp_dir += f'_{exp_id:05d}'
+        exp_dir += f'{exp_id:05d}-'
+    exp_dir = exp_dir[:-1]  # remove '-'
     out_dir = os.path.join(args.artifact_dir, 'ensembled_preds', exp_dir, aoi)
     os.makedirs(out_dir, exist_ok=True)
 
