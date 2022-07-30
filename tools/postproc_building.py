@@ -101,13 +101,13 @@ def postprocess(pre_image_fn, args, aoi):
 
     rows = []
     if len(feats) == 0: # no buildings detecting in the tile, write no prediction to submission
-        # ['ImageId', 'Object', 'Wkt_Pix', 'Flooded', 'length_m', 'travel_time_s']
+        # ['ImageId', 'Object', 'WKT_Pix', 'Flooded', 'length_m', 'travel_time_s']
         rows.append([image_id, 'Building', 'POLYGON EMPTY', 'False', 'Null', 'Null'])
     else:
         for f in feats:
             wkt_image_coords = geo_coords_to_image_coords(geotran, f['geometry'])
             flood_val = 'True' if f['properties']['mask_val'] == flooded_building_label else 'False'
-            # ['ImageId', 'Object', 'Wkt_Pix', 'Flooded', 'length_m', 'travel_time_s']
+            # ['ImageId', 'Object', 'WKT_Pix', 'Flooded', 'length_m', 'travel_time_s']
             rows.append([image_id, 'Building', wkt_image_coords, flood_val, 'Null', 'Null'])
 
     # submit without any road prediction
@@ -135,7 +135,7 @@ def main():
     args = parse_args()
 
     aois = [d for d in os.listdir(args.foundation) if os.path.isdir(os.path.join(args.foundation, d))]
-    cols = ['ImageId', 'Object', 'Wkt_Pix', 'Flooded', 'length_m', 'travel_time_s']
+    cols = ['ImageId', 'Object', 'WKT_Pix', 'Flooded', 'length_m', 'travel_time_s']
     rows = []
     for aoi in aois:
         print(f'processing {aoi} AOI')
