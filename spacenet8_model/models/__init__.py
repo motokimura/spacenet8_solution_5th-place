@@ -196,6 +196,9 @@ class Model(pl.LightningModule):
         if config.Optimizer.type == 'adam':
             optimizer = torch.optim.Adam(self.parameters(),
                 lr=config.Optimizer.lr, weight_decay=config.Optimizer.weight_decay)
+        elif config.Optimizer.type =='adamw':
+            optimizer = torch.optim.AdamW(self.parameters(),
+                lr=config.Optimizer.lr, weight_decay=config.Optimizer.weight_decay)
         else:
             raise ValueError(config.Optimizer.type)
 
