@@ -11,7 +11,7 @@ from skimage.morphology import opening, square
 from tqdm import tqdm
 
 # isort: off
-from spacenet8_model.utils.building_postprocess import (
+from spacenet8_model.utils.postproc_building import (
     get_flood_attributed_building_mask, polygonize_pred_mask,
     remove_small_polygons_and_simplify, geo_coords_to_image_coords)
 # isort: on
