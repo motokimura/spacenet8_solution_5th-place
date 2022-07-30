@@ -111,7 +111,8 @@ def postprocess(pre_image_fn, args, aoi):
             rows.append([image_id, 'Building', wkt_image_coords, flood_val, 'Null', 'Null'])
 
     # submit without any road prediction
-    # rows.append([image_id, 'Road', 'LINESTRING EMPTY', 'False', 'Null', 'Null'])
+    # this line is removed when concat building and road dataframe
+    rows.append([image_id, 'Road', 'LINESTRING EMPTY', 'False', 'Null', 'Null'])
     
     return rows
 
