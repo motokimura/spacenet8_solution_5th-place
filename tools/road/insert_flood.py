@@ -14,7 +14,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--graph', required=True)
     parser.add_argument('--flood', required=True)
-    parser.add_argument('--flood_thresh', type=float, default=0.5)
+    parser.add_argument('--flood_thresh', type=float, default=0.8)
     parser.add_argument('--artifact_dir', default='/wdata')
     parser.add_argument('--val', action='store_true')
     return parser.parse_args()
