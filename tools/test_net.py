@@ -33,10 +33,6 @@ def parse_args() -> argparse.Namespace:
         default='/wdata'
     )
     parser.add_argument(
-        '--out_dir',
-        default='/wdata'
-    )
-    parser.add_argument(
         '--device',
         default='cuda')
     parser.add_argument(
@@ -107,8 +103,8 @@ def main():
     model.to(args.device)
     model.eval()
 
-    out_root = 'val_preds' if args.val else 'preds'
-    out_root = os.path.join(args.out_dir, out_root, f'exp_{args.exp_id:05d}')
+    out_root = '_val/preds' if args.val else 'preds'
+    out_root = os.path.join(args.artifact_dir, out_root, f'exp_{args.exp_id:05d}')
     print(f'going to save prediction results under {out_root}')
 
     os.makedirs(out_root, exist_ok=True)

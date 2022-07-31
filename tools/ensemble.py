@@ -18,7 +18,6 @@ def parse_args():
     parser.add_argument('--exp_id', nargs='+', type=int, required=True)
     parser.add_argument('--root_dir', default='/data/test')
     parser.add_argument('--artifact_dir', default='/wdata')
-    parser.add_argument('--out_dir', default='/wdata')
     return parser.parse_args()
 
 
