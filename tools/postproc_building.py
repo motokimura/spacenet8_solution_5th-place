@@ -117,7 +117,7 @@ def postprocess(pre_image_fn, args, aoi):
     return rows
 
 
-def postprocess_aoi(args, aoi):
+def process_aoi(args, aoi):
     paths = glob(os.path.join(args.foundation, aoi, '*.tif'))
     paths.sort()
     pre_image_fns = [os.path.basename(path) for path in paths]
@@ -139,7 +139,7 @@ def main():
     rows = []
     for aoi in aois:
         print(f'processing {aoi} AOI')
-        ret = postprocess_aoi(args, aoi)
+        ret = process_aoi(args, aoi)
         rows.extend(ret)
     
     df = pd.DataFrame(rows, columns=cols)
@@ -151,7 +151,7 @@ def main():
     out_dir = os.path.join(args.artifact_dir, 'building_submissions', out_dir)
     os.makedirs(out_dir, exist_ok=True)
 
-    out_path = os.path.join(out_dir, 'building_submission.csv')
+    out_path = os.path.join(out_dir, 'solution.csv')
     df.to_csv(out_path, index=False)
     print(f'saved {out_path}')
 
