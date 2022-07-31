@@ -9,6 +9,7 @@ def parse_args():
     parser.add_argument('--building', required=True)
     parser.add_argument('--road', required=True)
     parser.add_argument('--artifact_dir', default='/wdata')
+    parser.add_argument('--val', action='store_true')
     return parser.parse_args()
 
 
@@ -34,7 +35,10 @@ def main():
     exp_road = os.path.basename(os.path.normpath(args.road)).replace('exp_', '')
     assert exp_building == exp_road, (exp_building, exp_road)
     out_dir = f'exp_{exp_building}'
-    out_dir = os.path.join(args.artifact_dir, 'submissions', out_dir)
+    if args.val:
+        out_dir = os.path.join(args.artifact_dir, '_val/submissions', out_dir)
+    else:
+        out_dir = os.path.join(args.artifact_dir, 'submissions', out_dir)
     os.makedirs(out_dir, exist_ok=True)
 
     out_path = os.path.join(out_dir, 'solution.csv')

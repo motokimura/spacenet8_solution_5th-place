@@ -22,6 +22,7 @@ def parse_args():
                         type=int,
                         default=20)
     parser.add_argument('--artifact_dir', default='/wdata')
+    parser.add_argument('--val', action='store_true')
     return parser.parse_args()
 
 
@@ -99,7 +100,10 @@ def main():
     print(df.head(15))
 
     out_dir = os.path.basename(os.path.normpath(args.foundation))
-    out_dir = os.path.join(args.artifact_dir, 'road_vectors', out_dir)
+    if args.val:
+        out_dir = os.path.join(args.artifact_dir, '_val/road_vectors', out_dir)
+    else:
+        out_dir = os.path.join(args.artifact_dir, 'road_vectors', out_dir)
     os.makedirs(out_dir, exist_ok=True)
 
     out_path = os.path.join(out_dir, 'road_vectors.csv')

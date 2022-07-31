@@ -40,6 +40,7 @@ def parse_args():
                         type=float,
                         default=0.5)
     parser.add_argument('--artifact_dir', default='/wdata')
+    parser.add_argument('--val', action='store_true')
     return parser.parse_args()
 
 
@@ -148,7 +149,10 @@ def main():
     exp_foundation = os.path.basename(os.path.normpath(args.foundation)).replace('exp_', '')
     exp_flood = os.path.basename(os.path.normpath(args.flood)).replace('exp_', '')
     out_dir = f'exp_{exp_foundation}_{exp_flood}'
-    out_dir = os.path.join(args.artifact_dir, 'building_submissions', out_dir)
+    if args.val:
+        out_dir = os.path.join(args.artifact_dir, '_val/building_submissions', out_dir)
+    else:
+        out_dir = os.path.join(args.artifact_dir, 'building_submissions', out_dir)
     os.makedirs(out_dir, exist_ok=True)
 
     out_path = os.path.join(out_dir, 'solution.csv')

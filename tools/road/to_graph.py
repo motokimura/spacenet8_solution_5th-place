@@ -18,6 +18,7 @@ def parse_args():
                         type=int,
                         default=20)
     parser.add_argument('--artifact_dir', default='/wdata')
+    parser.add_argument('--val', action='store_true')
     return parser.parse_args()
 
 
@@ -43,7 +44,10 @@ def main():
     n_threads = 1
 
     out_root = os.path.basename(os.path.normpath(args.vector))
-    out_root = os.path.join(args.artifact_dir, 'road_graphs', out_root)
+    if args.val:
+        out_root = os.path.join(args.artifact_dir, '_val/road_graphs', out_root)
+    else:
+        out_root = os.path.join(args.artifact_dir, 'road_graphs', out_root)
     print(f'going to save road graphs under {out_root}')
 
     params = []
