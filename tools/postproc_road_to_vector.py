@@ -72,7 +72,7 @@ def postprocess(foundation_path, args, aoi):
     return df
 
 
-def postprocess_aoi(args, aoi):
+def process_aoi(args, aoi):
     foundation_paths = glob(os.path.join(args.foundation, aoi, '*.tif'))
     foundation_paths.sort()
 
@@ -93,7 +93,7 @@ def main():
     df = pd.DataFrame(columns=['ImageId', 'WKT_Pix'])
     for aoi in aois:
         print(f'processing {aoi} AOI')
-        ret = postprocess_aoi(args, aoi)
+        ret = process_aoi(args, aoi)
         df = df.append(ret)
 
     print(df.head(15))
