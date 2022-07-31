@@ -18,3 +18,29 @@ python tools/train_net.py --task {task} --exp_id {exp_id}
 ```
 python tools/test_net.py --exp_id {exp_id}
 ```
+
+## ensemble
+
+```
+python tools/ensemble.py --exp_id {exp_id_0, exp_id_1, ...}
+```
+
+## post-process (building)
+
+```
+python tools/building/postproc_building.py --foundation {foundation_dir} --flood {flood_dir}
+```
+
+## post-process (road)
+
+```
+python tools/road/vectorize.py --foundation {foundation_dir}
+python tools/road/to_graph.py --vector {vector_dir}
+python tools/road/insert_flood.py --flood {flood_dir} --graph {graph_dir}
+```
+
+## create submission csv
+
+```
+python tools/submit.py --building {building_dir} --road {road_dir}
+```
