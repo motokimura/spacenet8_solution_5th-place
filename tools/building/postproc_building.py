@@ -47,41 +47,41 @@ def parse_args():
 pre_image_blacklist = [
     # Foundation error:
     # - Louisiana-East_Training_Public
-    '10300100AF395C00_2_18_35',  # building FN
-    '10300100AF395C00_2_19_35',  # building FN
-    '10400100684A4B00_1_22_70',  # building FN
-    '10400100684A4B00_1_23_70',  # building FN
-    '10400100684A4B00_1_24_70',  # building FN
-    '10400100684A4B00_1_25_70',  # building FN
-    '10400100684A4B00_1_26_70',  # building FN
-    '10400100684A4B00_1_2_84',  # building FN
+    '10300100AF395C00_2_18_35.tif',  # building FN
+    '10300100AF395C00_2_19_35.tif',  # building FN
+    '10400100684A4B00_1_22_70.tif',  # building FN
+    '10400100684A4B00_1_23_70.tif',  # building FN
+    '10400100684A4B00_1_24_70.tif',  # building FN
+    '10400100684A4B00_1_25_70.tif',  # building FN
+    '10400100684A4B00_1_26_70.tif',  # building FN
+    '10400100684A4B00_1_2_84.tif',  # building FN
     # Flood error:
     # - Germany_Training_Public
-    '10500500C4DD7000_0_26_62',  # warping
-    '10500500C4DD7000_0_27_62',  # warping
-    '10500500C4DD7000_0_27_63',  # flood road FP
-    '10500500C4DD7000_0_27_64',  # flood road FP
-    '10500500C4DD7000_0_29_70',  # warping
-    '10500500C4DD7000_0_30_70',  # warping
+    '10500500C4DD7000_0_26_62.tif',  # warping
+    '10500500C4DD7000_0_27_62.tif',  # warping
+    '10500500C4DD7000_0_27_63.tif',  # flood road FP
+    '10500500C4DD7000_0_27_64.tif',  # flood road FP
+    '10500500C4DD7000_0_29_70.tif',  # warping
+    '10500500C4DD7000_0_30_70.tif',  # warping
     # - Louisiana-East_Training_Public
-    '10300100AF395C00_2_13_45',  # flood road & building FN
-    '10300100AF395C00_2_13_46',  # flood building FN
-    '10300100AF395C00_2_13_47',  # flood road & building FN
-    '10300100AF395C00_2_14_46',  # flood building FN
-    '10300100AF395C00_2_22_43',  # flood road & building FN
-    '105001001A0FFC00_0_12_13',  # flood road FN
-    '105001001A0FFC00_0_16_14',  # flood road FN
-    '105001001A0FFC00_0_17_15',  # flood road FN
-    '105001001A0FFC00_0_20_17',  # flood road & building FN
-    '10400100684A4B00_1_15_88',  # flood road FN
-    '10400100684A4B00_1_15_93',  # flood road FN
-    '10400100684A4B00_1_16_73',  # flood road FN
-    '10400100684A4B00_1_20_82',  # flood building FN
-    '10400100684A4B00_1_21_79',  # flood building FN
-    '10400100684A4B00_1_21_86',  # flood building FN
-    '10400100684A4B00_1_22_79',  # flood building FN
-    '10400100684A4B00_1_23_78',  # flood road & building FN
-    '10400100684A4B00_1_23_79',  # flood road & building FN
+    '10300100AF395C00_2_13_45.tif',  # flood road & building FN
+    '10300100AF395C00_2_13_46.tif',  # flood building FN
+    '10300100AF395C00_2_13_47.tif',  # flood road & building FN
+    '10300100AF395C00_2_14_46.tif',  # flood building FN
+    '10300100AF395C00_2_22_43.tif',  # flood road & building FN
+    '105001001A0FFC00_0_12_13.tif',  # flood road FN
+    '105001001A0FFC00_0_16_14.tif',  # flood road FN
+    '105001001A0FFC00_0_17_15.tif',  # flood road FN
+    '105001001A0FFC00_0_20_17.tif',  # flood road & building FN
+    '10400100684A4B00_1_15_88.tif',  # flood road FN
+    '10400100684A4B00_1_15_93.tif',  # flood road FN
+    '10400100684A4B00_1_16_73.tif',  # flood road FN
+    '10400100684A4B00_1_20_82.tif',  # flood building FN
+    '10400100684A4B00_1_21_79.tif',  # flood building FN
+    '10400100684A4B00_1_21_86.tif',  # flood building FN
+    '10400100684A4B00_1_22_79.tif',  # flood building FN
+    '10400100684A4B00_1_23_78.tif',  # flood road & building FN
+    '10400100684A4B00_1_23_79.tif',  # flood road & building FN
 ]
 
 
