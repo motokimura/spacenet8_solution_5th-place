@@ -1,4 +1,5 @@
 #!/bin/bash
+# example usage: ./scripts/this_script.sh
 
 python tools/make_folds_v1.py
 python tools/make_folds_v2.py

@@ -1,5 +1,5 @@
 #!/bin/bash
-# example usage: ./scripts/test_all_folds.sh 0 --config path/to/config General.seed=1000
+# example usage: ./scripts/this_script.sh 0 --config path/to/config General.seed=1000
 
 EXP_ID=$1
 TEST_ARGS=${@:2}

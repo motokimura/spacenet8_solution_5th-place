@@ -1,5 +1,5 @@
 #!/bin/bash
-# example usage: ./scripts/val_road.sh 10100 15100
+# example usage: ./scripts/this_script.sh 10100 15100
 
 foundation=$1
 flood=$2
