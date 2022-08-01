@@ -4,6 +4,7 @@
 
 ```
 ./scripts/preprocess.sh
+./scripts/mosaic.sh
 ```
 
 ## train networks
