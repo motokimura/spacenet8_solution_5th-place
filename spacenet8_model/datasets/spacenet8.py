@@ -103,6 +103,18 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
             assert os.path.exists(road), road
             road_paths.append(road)
 
+        if is_train and config.Data.use_mosaic_for_train:
+            path = os.path.join(config.Data.artifact_dir, f'mosaics/train_{config.fold_id}/mosaics.csv')
+            df = pd.read_csv(path)
+            for i, row in df.iterrows():
+                # assuming images in the blacklist are already removed
+                pre_paths.append(row['pre'])
+                post1_paths.append(row['post1'])
+                post2_paths.append(row['post2'])
+                building_3channel_paths.append(row['building_3channel'])
+                building_flood_paths.append(row['building_flood'])
+                road_paths.append(row['road'])
+
         mask_paths = {
             'building_3channel': building_3channel_paths,
             'building_flood': building_flood_paths,

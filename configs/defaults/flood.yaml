@@ -42,6 +42,7 @@ Data:
     10400100684A4B00_1_23_78.tif,  # flood road & building FN
     10400100684A4B00_1_23_79.tif,  # flood road & building FN
   ]
+  use_mosaic_for_train: True
 Dataloader:
   train_batch_size: 10
   train_num_workers: 6
