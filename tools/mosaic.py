@@ -261,6 +261,11 @@ def process(args, df, tile_prefix):
                     post2_mosaic[:, w + offset] = tmp[:, w + max_gap_width]
                 if post2_mosaic[:, w - (offset + 1)].min() == 0:
                     post2_mosaic[:, w - (offset + 1)] = tmp[:, w - (max_gap_width + 1)]
+            for offset in range(max_gap_width):
+                if post2_mosaic[h + offset, :].min() <= 0:
+                    post2_mosaic[h + offset, :] = tmp[h + max_gap_width, :]
+                if post2_mosaic[h - (offset + 1), :].min() == 0:
+                    post2_mosaic[h - (offset + 1), :] = tmp[h - (max_gap_width + 1), :]
         
         post1_mosaic = post1_mosaic[crop_top:crop_bottom, crop_left:crop_right]
         if post2_mosaic is not None:
