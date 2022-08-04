@@ -5,7 +5,6 @@ import os
 import numpy as np
 import torch
 from omegaconf import DictConfig, OmegaConf
-from skimage import io
 from tqdm import tqdm
 
 # isort: off
@@ -40,12 +39,16 @@ def parse_args() -> argparse.Namespace:
         action='store_true'
     )
     parser.add_argument(
-        '--tta_hflip',
-        action='store_true'
+        '--tta_hflip_channels',
+        type=int,
+        nargs='*',
+        default=[]
     )
     parser.add_argument(
-        '--tta_vflip',
-        action='store_true'
+        '--tta_vflip_channels',
+        type=int,
+        nargs='*',
+        default=[]
     )
     parser.add_argument(
         'opts',
@@ -88,49 +91,42 @@ def crop_center(pred, crop_wh):
     return pred[:, top:bottom, left:right]
 
 
-def dump_pred_to_png(pred, png_path):
-    c, h, w = pred.shape
-    # assert c <= 3
-    if c > 3:
-        pred = pred[:3]  # XXX: save all channels as TIFF
-    assert pred.min() >= 0
-    assert pred.max() <= 1
-    array = np.zeros(shape=[h, w, 3], dtype=np.uint8)
-    array[:, :, :c] = (pred * 255).astype(np.uint8).transpose((1, 2, 0))
-    io.imsave(png_path, array, check_contrast=False)
-
-
 def prepare_test_dataloaders(config, args):
     test_to_val = args.val
+    classes = np.array(get_flatten_classes(config))
+    n_classses = len(classes)
 
     # prepare dataloaders, flipping flags, and weights for averaging
     test_dataloaders, flags_hflip, flags_vflip, weights = [], [], [], []
 
     # default dataloader (w/o tta)
     test_dataloaders.append(get_test_dataloader(config, test_to_val=test_to_val))
-    weights.append(1.0)
     flags_hflip.append(False)
     flags_vflip.append(False)
+    weights.append([1] * n_classses)
 
     # dataloader w/ tta horizontal flipping
-    if args.tta_hflip:
-        print('horizontal flip TTA is enabled')
+    if len(args.tta_hflip_channels) > 0:
+        print(f'horizontal flip TTA is enabled for classes: {classes[args.tta_hflip_channels]}')
         test_dataloaders.append(get_test_dataloader(config, test_to_val=test_to_val, tta_hflip=True))
-        weights.append(1.0)
         flags_hflip.append(True)
         flags_vflip.append(False)
+        w = [1 if (i in args.tta_hflip_channels) else 0 for i in range(n_classses)]
+        weights.append(w)
 
     # dataloader w/ tta vertical flipping
-    if args.tta_vflip:
-        print('vertical flip TTA is enabled')
+    if len(args.tta_vflip_channels) > 0:
+        print(f'vertical flip TTA is enabled for classes: {classes[args.tta_vflip_channels]}')
         test_dataloaders.append(get_test_dataloader(config, test_to_val=test_to_val, tta_vflip=True))
-        weights.append(1.0)
         flags_hflip.append(False)
         flags_vflip.append(True)
+        w = [1 if (i in args.tta_vflip_channels) else 0 for i in range(n_classses)]
+        weights.append(w)
 
     # normalize weights
-    weights = np.array(weights)
-    weights /= weights.sum()
+    weights = np.array(weights, dtype=float)  # shape: [1 + n_tta, n_classes]
+    weights /= weights.sum(axis=0, keepdims=True)
+    weights = weights[:, :, np.newaxis, np.newaxis]  # shape: [1 + n_tta, n_classes, 1, 1]
 
     return test_dataloaders, flags_hflip, flags_vflip, weights
 
