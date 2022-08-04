@@ -43,7 +43,7 @@ def get_transforms(config, is_train):
     )
 
 
-def get_test_transforms(config):
+def get_test_transforms(config, tta_hflip=False, tta_vflip=False):
     transforms = [
         albu.PadIfNeeded(
             pad_height_divisor=32,
@@ -55,6 +55,13 @@ def get_test_transforms(config):
             value=0,
         ),
     ]
+
+    # tta flipping
+    if tta_hflip:
+        transforms.append(albu.HorizontalFlip(always_apply=True))
+    if tta_vflip:
+        transforms.append(albu.VerticalFlip(always_apply=True))
+
     return albu.Compose(
         transforms,
         additional_targets={
