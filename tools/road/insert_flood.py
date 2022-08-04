@@ -7,6 +7,7 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 from osgeo import gdal, ogr, osr
+from shapely.wkt import dumps, loads
 from tqdm import tqdm
 
 
@@ -336,6 +337,25 @@ def add_empty_rows(args, df, cols):
     return df
 
 
+def remove_duplicate_linestring_section(df):
+    df = df.reset_index(drop=True)
+    for i, row in df.iterrows():
+        if row.Object != 'Road':
+            continue
+        if row.WKT_Pix == 'LINESTRING EMPTY':
+            continue
+
+        wkt_geom = loads(row.WKT_Pix)
+        points = list(wkt_geom.coords)
+        if (points[0] == points[-1]) and (len(points) == 3):
+            print('found duplicate LINESTRING section:')
+            print(row)
+            wkt_geom.coords = wkt_geom.coords[:-1]  # remove the last point
+            linestring = dumps(wkt_geom, rounding_precision=0)
+            df.at[i, 'WKT_Pix'] = linestring
+    return df
+
+
 def main():
     args = parse_args()
 
@@ -373,6 +393,9 @@ def main():
         # remove images in the blacklist
        image_id_blacklist = [os.path.splitext(x)[0] for x in pre_image_blacklist]
        df = df[~df.ImageId.isin(image_id_blacklist)]
+
+    # workaround to avoid submission error
+    df = remove_duplicate_linestring_section(df)
 
     print(df.head(15))
 
