@@ -166,14 +166,27 @@ class Model(pl.LightningModule):
         tn = torch.cat([x['tn'] for x in outputs])
 
         ious = {}
+        ious_foundation, ious_flood = [], []
         for i, class_name in enumerate(get_flatten_classes(self.config)):
             if class_name == '_background':
                 continue  # exclude background class from iou evaluation
-            ious[f'{prefix}/{class_name}'] = smp.metrics.iou_score(
-                tp[:, i], fp[:, i], fn[:, i], tn[:, i], reduction=reduction)
-        iou = torch.stack([v for v in ious.values()]).mean()
 
+            iou = smp.metrics.iou_score(
+                tp[:, i], fp[:, i], fn[:, i], tn[:, i], reduction=reduction)
+            ious[f'{prefix}/{class_name}'] = iou
+
+            if class_name in ['building', 'road']:
+                ious_foundation.append(iou)
+            if class_name in ['flood_building', 'flood_road']:
+                ious_flood.append(iou)
+
+        iou = torch.stack([v for v in ious.values()]).mean()
         ious[prefix] = iou
+
+        if len(ious_foundation) > 0:
+            ious[f'{prefix}_foundation'] = torch.stack(ious_foundation).mean()
+        if len(ious_flood) > 0:
+            ious[f'{prefix}_flood'] = torch.stack(ious_flood).mean()
 
         return ious
 
