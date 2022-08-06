@@ -12,11 +12,13 @@ from spacenet8_model.utils.misc import get_flatten_classes
 
 class SpaceNet8Dataset(torch.utils.data.Dataset):
     def __init__(self, config, is_train, transform=None):
-        self.pre_paths, self.post1_paths, self.post2_paths, self.mask_paths = self.get_file_paths(config, is_train)
+        self.pre_paths, self.post1_paths, self.post2_paths, self.mask_paths, self.post1_mses, self.post2_mses \
+            = self.get_file_paths(config, is_train)
         self.masks_to_load = self.get_mask_types_to_load(config)
 
         self.config = config
         self.transform = transform
+        self.is_train = is_train
 
     def __len__(self):
         return len(self.pre_paths)
@@ -64,6 +66,8 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
         building_3channel_paths = []
         building_flood_paths = []
         road_paths = []
+        post1_mses = []
+        post2_mses = []
         for i, row in df.iterrows():
             aoi = row['aoi']
 
@@ -103,6 +107,9 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
             assert os.path.exists(road), road
             road_paths.append(road)
 
+            post1_mses.append(row['mse1'])
+            post2_mses.append(row['mse2'])
+
         if is_train and config.Data.use_mosaic_for_train:
             path = os.path.join(config.Data.artifact_dir, f'mosaics/train_{config.fold_id}/mosaics.csv')
             df = pd.read_csv(path)
@@ -110,17 +117,25 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
                 # assuming images in the blacklist are already removed
                 pre_paths.append(row['pre'])
                 post1_paths.append(row['post1'])
-                post2_paths.append(row['post2'])
+
+                post2 = row['post2']
+                if not isinstance(post2, str):
+                    post2 = None
+                post2_paths.append(post2)
+
                 building_3channel_paths.append(row['building_3channel'])
                 building_flood_paths.append(row['building_flood'])
                 road_paths.append(row['road'])
+
+                post1_mses.append(row['mse1'])
+                post2_mses.append(row['mse2'])
 
         mask_paths = {
             'building_3channel': building_3channel_paths,
             'building_flood': building_flood_paths,
             'road': road_paths,
         }
-        return pre_paths, post1_paths, post2_paths, mask_paths
+        return pre_paths, post1_paths, post2_paths, mask_paths, post1_mses, post2_mses
 
     def get_mask_types_to_load(self, config):
         mask_types = []
@@ -205,16 +220,25 @@ class SpaceNet8Dataset(torch.utils.data.Dataset):
         return (mask > 0).astype(np.float32)
 
     def load_post_images(self, idx):
+        post_select_method = self.config.Model.train_post_select_method if self.is_train else self.config.Model.test_post_select_method
+        if self.is_train:
+            assert post_select_method in ['always_post1', 'less_mse', 'less_mse_prob'], post_select_method
+        else:
+            assert post_select_method in ['always_post1', 'less_mse'], post_select_method
         return load_post_images(
             self.post1_paths[idx],
             self.post2_paths[idx],
-            self.config.Model.n_input_post_images
+            self.post1_mses[idx],
+            self.post2_mses[idx],
+            self.config.Model.n_input_post_images,
+            post_select_method=post_select_method
         )
 
 
 class SpaceNet8TestDataset(torch.utils.data.Dataset):
     def __init__(self, config, transform=None, test_to_val=False):
-        self.pre_paths, self.post1_paths, self.post2_paths = self.get_file_paths(config, test_to_val)
+        self.pre_paths, self.post1_paths, self.post2_paths, self.post1_mses, self.post2_mses \
+            = self.get_file_paths(config, test_to_val)
 
         self.config = config
         self.transform = transform
@@ -267,6 +291,8 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
         pre_paths = []
         post1_paths = []
         post2_paths = []
+        post1_mses = []
+        post2_mses = []
         for i, row in df.iterrows():
             aoi = row['aoi']
 
@@ -286,25 +312,54 @@ class SpaceNet8TestDataset(torch.utils.data.Dataset):
                 post2 = None
             post2_paths.append(post2)
 
-        return pre_paths, post1_paths, post2_paths
+            post1_mses.append(row['mse1'])
+            post2_mses.append(row['mse2'])
+
+        return pre_paths, post1_paths, post2_paths, post1_mses, post2_mses
 
     def load_post_images(self, idx):
+        post_select_method = self.config.Model.test_post_select_method
+        assert post_select_method in ['always_post1', 'less_mse'], post_select_method
         return load_post_images(
             self.post1_paths[idx],
             self.post2_paths[idx],
-            self.config.Model.n_input_post_images
+            self.post1_mses[idx],
+            self.post2_mses[idx],
+            self.config.Model.n_input_post_images,
+            post_select_method=post_select_method
         )
 
 
-def load_post_images(post1_path, post2_path, n_input_post_images):
+def load_post_images(post1_path, post2_path, post1_mse, post2_mse, n_input_post_images, post_select_method):
     if n_input_post_images == 0:
         return {}
 
     elif n_input_post_images == 1:
-        post1 = io.imread(post1_path)
-        return {
-            'image_post_a': post1
-        }
+        if post2_path is None:
+            # if post-2 image does not exist, return post-1 image
+            return {'image_post_a': io.imread(post1_path)}
+
+        if post_select_method == 'always_post1':
+            return {'image_post_a': io.imread(post1_path)}
+        elif post_select_method == 'less_mse':
+            if post1_mse <= post2_mse:
+                return {'image_post_a': io.imread(post1_path)}
+            else:
+                return {'image_post_a': io.imread(post2_path)}
+        elif post_select_method == 'less_mse_prob':
+            max_mse_diff = 900.0
+            if post1_mse <= post2_mse:
+                post2_prob = (1.0 - min((post2_mse - post1_mse) / max_mse_diff, 1.0)) * 0.5
+                post1_prob = 1.0 - post2_prob
+                assert post1_prob >= post2_prob, (post1_prob, post2_prob)
+            else:
+                post1_prob = (1.0 - min((post1_mse - post2_mse) / max_mse_diff, 1.0)) * 0.5
+                post2_prob = 1.0 - post1_prob
+                assert post2_prob > post1_prob, (post1_prob, post2_prob)
+            post_path = np.random.choice([post1_path, post2_path], size=1, p=[post1_prob, post2_prob])[0]
+            return {'image_post_a': io.imread(post_path)}
+        else:
+            raise ValueError(post_select_method)
 
     elif n_input_post_images == 2:
         post1 = io.imread(post1_path)

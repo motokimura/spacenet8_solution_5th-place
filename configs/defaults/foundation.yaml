@@ -35,6 +35,8 @@ Model:
   n_input_post_images: 0
   n_siamese_head_convs: 2
   siamese_head_kernel_size: 3
+  train_post_select_method: less_mse_prob  # valid when n_input_post_images=1 [always_post1, less_mse, or less_mse_prob] 
+  test_post_select_method: less_mse  # valid when n_input_post_images=1 [always_post1 or less_mse]
 Class:
   groups: [building, road]
   classes:
@@ -69,3 +71,4 @@ General:
   deterministic: true
   benchmark: false
   check_val_every_n_epoch: 1
+  val_metric_to_monitor: val/iou_foundation

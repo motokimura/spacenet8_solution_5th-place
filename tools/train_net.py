@@ -93,7 +93,7 @@ def main() -> None:
         filename='best',
         save_weights_only=False,
         save_top_k=1,
-        monitor=f'val/iou',
+        monitor=config.General.val_metric_to_monitor,
         mode='max',
         save_last=True)
     lr_monitor_callback = LearningRateMonitor(logging_interval='epoch')

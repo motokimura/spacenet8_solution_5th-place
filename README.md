@@ -5,6 +5,7 @@
 ```
 ./scripts/preprocess.sh
 ./scripts/mosaic.sh
+python tools/measure_image_similarities.py
 ```
 
 ## train networks
