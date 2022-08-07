@@ -16,6 +16,7 @@ def parse_args():
     parser.add_argument('--graph', required=True)
     parser.add_argument('--flood', required=True)
     parser.add_argument('--flood_thresh', type=float, default=0.8)
+    parser.add_argument('--flood_area_ratio', type=float, default=0.5)
     parser.add_argument('--artifact_dir', default='/wdata')
     parser.add_argument('--val', action='store_true')
     return parser.parse_args()
@@ -232,7 +233,7 @@ def pkl_dir_to_wkt(pkl_dir,
     return df
 
 
-def insert_flood_pred(flood_pred_dir, df, road_flood_channel, flood_thresh):
+def insert_flood_pred(flood_pred_dir, df, road_flood_channel, flood_thresh, flood_area_ratio):
     flood_road_label = 4  # same as sn-8 baseline (any positive int should be okay)
 
     dy=2
@@ -274,9 +275,10 @@ def insert_flood_pred(flood_pred_dir, df, road_flood_channel, flood_thresh):
                     nums.extend(flood_arr[top:bot,left:right].flatten())
 
             currow = row
-            maxval = np.argmax(np.bincount(nums))
-            if maxval == flood_road_label:
-                currow["Flooded"] = "True"
+            binned = np.bincount(nums)
+            if len(binned) > 1:
+                if binned[flood_road_label] / np.sum(binned) > flood_area_ratio:
+                    currow["Flooded"] = "True"
 
         out_rows.append([currow[k] for k in list(currow.keys())])
 
@@ -306,7 +308,8 @@ def process_aoi(args, aoi):
         flood_dir,
         df,
         road_flood_channel,
-        args.flood_thresh
+        args.flood_thresh,
+        args.flood_area_ratio
     )
     
     return df
