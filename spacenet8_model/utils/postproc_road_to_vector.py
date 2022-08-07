@@ -23,7 +23,8 @@ from scipy import ndimage as ndi
 from scipy.spatial.distance import pdist, squareform
 from skimage.morphology import (closing, dilation, disk, erosion, medial_axis,
                                 opening, remove_small_holes,
-                                remove_small_objects, skeletonize, square)
+                                remove_small_objects, skeletonize,
+                                skeletonize_3d, square)
 from spacenet8_model.utils.road_utils import sknw, sknw_int64
 
 linestring = "LINESTRING {}"
@@ -674,6 +675,7 @@ def make_skeleton(img_loc, thresh, debug, fix_borders, replicate=5,
         if verbose:
             print("skeletonize...")
         ske = skeletonize(img).astype(np.uint16)
+        #ske = skeletonize_3d(img).astype(np.uint16)
         t3 = time.time()
         if verbose:
             print("Time to run skimage.skeletonize():", t3-t2, "seconds")
