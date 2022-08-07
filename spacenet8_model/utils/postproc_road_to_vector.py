@@ -23,7 +23,7 @@ from scipy import ndimage as ndi
 from scipy.spatial.distance import pdist, squareform
 from skimage.morphology import (closing, dilation, disk, erosion, medial_axis,
                                 opening, remove_small_holes,
-                                remove_small_objects, skeletonize)
+                                remove_small_objects, skeletonize, square)
 from spacenet8_model.utils.road_utils import sknw, sknw_int64
 
 linestring = "LINESTRING {}"
@@ -570,6 +570,9 @@ def preprocess(img, thresh, img_mult=255, hole_size=300,
         remove_small_objects(img, hole_size, in_place=True)
         remove_small_holes(img, hole_size, in_place=True)
         # img = cv2.dilate(img.astype(np.uint8), np.ones((7, 7)))
+
+        #img = dilation(img, square(5))
+        #img = erosion(img, square(5))
 
     # cv2 is generally far faster and more memory efficient (though less
     #  effective)
