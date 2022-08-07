@@ -4,4 +4,6 @@
 foundation=$1
 flood=$2
 
-python tools/building/postproc_building.py --val --foundation /wdata/_val/preds/exp_$foundation --flood /wdata/_val/preds/exp_$flood
+foundation_dir=$(printf "/wdata/_val/preds/exp_%05d" "$foundation")
+flood_dir=$(printf "/wdata/_val/preds/exp_%05d" "$flood")
+python tools/building/postproc_building.py --val --foundation $foundation_dir --flood $flood_dir
