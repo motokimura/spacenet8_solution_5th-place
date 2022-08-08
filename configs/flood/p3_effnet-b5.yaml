@@ -1,0 +1,17 @@
+Dataloader:
+  train_batch_size: 16
+  val_batch_size: 16
+  train_num_workers: 8
+  val_num_workers: 8
+Transform:
+  train_random_crop_size: [320, 320]
+Model:
+  encoder: timm-efficientnet-b5
+Optimizer:
+  lr: 2e-4
+Scheduler:
+  type: multistep
+  multistep_milestones: [80, 120]
+  multistep_gamma: 0.1
+General:
+  epochs: 140
