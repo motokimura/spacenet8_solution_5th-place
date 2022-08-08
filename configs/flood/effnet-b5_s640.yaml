@@ -1,6 +1,0 @@
-Dataloader:
-  train_batch_size: 2
-Transform:
-  train_random_crop_size: [640, 640]
-Model:
-  encoder: timm-efficientnet-b5

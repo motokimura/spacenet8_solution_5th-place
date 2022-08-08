@@ -1,6 +1,0 @@
-Dataloader:
-  train_batch_size: 10
-Transform:
-  train_random_crop_size: [512, 512]
-Model:
-  encoder: timm-regnety_080
