@@ -1,5 +1,5 @@
 Dataloader:
-  train_batch_size: 16
+  train_batch_size: 14
   val_batch_size: 16
   train_num_workers: 8
   val_num_workers: 8
@@ -8,7 +8,7 @@ Transform:
 Model:
   encoder: timm-efficientnet-b5
 Optimizer:
-  lr: 2e-4
+  lr: 1.75e-4
 Scheduler:
   type: multistep
   multistep_milestones: [80, 120]
