@@ -71,4 +71,4 @@ General:
   deterministic: true
   benchmark: false
   check_val_every_n_epoch: 1
-  val_metric_to_monitor: val/iou_foundation
+  val_metric_to_monitor: val/iou
