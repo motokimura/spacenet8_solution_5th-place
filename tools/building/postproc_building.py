@@ -35,7 +35,7 @@ def parse_args():
                         default=0.5)
     parser.add_argument('--flood_thresh',
                         type=float,
-                        default=0.8)
+                        default=0.6)
     parser.add_argument('--flood_area_ratio',
                         type=float,
                         default=0.5)
