@@ -1,5 +1,6 @@
 Dataloader:
   train_batch_size: 8
+  test_batch_size: 4
 Transform:
   train_random_crop_size: [320, 320]
 Model:
