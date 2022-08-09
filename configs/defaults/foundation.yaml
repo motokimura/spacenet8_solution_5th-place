@@ -35,6 +35,7 @@ Model:
   n_input_post_images: 0
   n_siamese_head_convs: 2
   siamese_head_kernel_size: 3
+  siamese_head_module: 'conv'  # 'conv', 'conv_relu', or 'conv_bn_relu'
   train_post_select_method: less_mse_prob  # valid when n_input_post_images=1 [always_post1, less_mse, or less_mse_prob] 
   test_post_select_method: less_mse  # valid when n_input_post_images=1 [always_post1 or less_mse]
 Class:
