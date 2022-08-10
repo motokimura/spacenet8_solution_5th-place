@@ -6,4 +6,5 @@ Transform:
   train_random_crop_size: [320, 320]
 Model:
   encoder: timm-efficientnet-b5
-  siamese_head_kernel_size: 7
+  siamese_head_kernel_size_last: 7
+  n_siamese_head_convs: 1

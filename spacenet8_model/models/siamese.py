@@ -54,13 +54,15 @@ class SiameseModel(torch.nn.Module):
         else:
             raise ValueError(head_module)
 
+        kernel_size = config.Model.siamese_head_kernel_size_last
+        padding = (kernel_size - 1) // 2
         head.append(
             torch.nn.Conv2d(
                 head_in_channels,
                 n_classes,
-                kernel_size=1,
+                kernel_size=kernel_size,
                 stride=1,
-                padding=0
+                padding=padding
             )
         )
         self.head = torch.nn.Sequential(*head)
