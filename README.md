@@ -1,5 +1,12 @@
 # spacenet8_solution
 
+## docker build
+
+```
+./docker/build.sh
+./docker/run.sh
+```
+
 ## data preprocess
 
 ```
