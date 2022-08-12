@@ -103,3 +103,5 @@ General:
   benchmark: false
   check_val_every_n_epoch: 1
   val_metric_to_monitor: val/iou_flood
+  enable_ema: false
+  ema_momentum: 2e-3  # valid when enable_ema=true

@@ -10,6 +10,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 # isort: off
 from spacenet8_model.datasets import get_dataloader
 from spacenet8_model.models import get_model
+from spacenet8_model.utils.ema import EMA
 from spacenet8_model.utils.config import load_config
 from spacenet8_model.utils.wandb import get_wandb_logger
 # isort: on
@@ -98,6 +99,10 @@ def main() -> None:
         save_last=True)
     lr_monitor_callback = LearningRateMonitor(logging_interval='epoch')
     callbacks = [checkpoint_callback, lr_monitor_callback]
+
+    if config.General.enable_ema:
+        print(f'enable EMA with momentum={config.General.ema_momentum}')
+        callbacks.append(EMA(decay=1-config.General.ema_momentum))
 
     loggers = [TensorBoardLogger(output_dir, name=None)]
     if (not args.dry) and (not args.disable_wandb):
