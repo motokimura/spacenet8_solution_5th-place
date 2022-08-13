@@ -175,7 +175,7 @@ def process_aoi(args, aoi):
 
 def main():
     args = parse_args()
-    print(f'flood_thresh = {args.flood_thresh}')
+    print(f'flood_thresh={args.flood_thresh}')
 
     aois = [d for d in os.listdir(args.foundation) if os.path.isdir(os.path.join(args.foundation, d))]
     cols = ['ImageId', 'Object', 'WKT_Pix', 'Flooded', 'length_m', 'travel_time_s']

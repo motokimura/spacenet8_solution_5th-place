@@ -103,10 +103,10 @@ def main() -> None:
 
     assert (not config.General.enable_ema) or (not config.General.enable_swa)
     if config.General.enable_ema:
-        print(f'enable EMA with momentum = {config.General.ema_momentum}')
+        print(f'enable EMA with momentum={config.General.ema_momentum}')
         callbacks.append(EMA(decay=1-config.General.ema_momentum))
     if config.General.enable_swa:
-        print(f'enable SWA with lr = {config.General.swa_lr} and epoch_start = {config.General.swa_epoch_start}')
+        print(f'enable SWA with lr={config.General.swa_lr} and epoch_start={config.General.swa_epoch_start}')
         callbacks.append(SWA(swa_epoch_start=config.General.swa_epoch_start, swa_lrs=config.General.swa_lr))
 
     loggers = [TensorBoardLogger(output_dir, name=None)]
