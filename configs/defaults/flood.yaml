@@ -105,3 +105,6 @@ General:
   val_metric_to_monitor: val/iou_flood
   enable_ema: false
   ema_momentum: 2e-3  # valid when enable_ema=true
+  enable_swa: false
+  swa_lr: 1e-4  # valid when enable_swa=true
+  swa_epoch_start: 90  # valid when enable_swa=true

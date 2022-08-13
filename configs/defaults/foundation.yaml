@@ -77,3 +77,6 @@ General:
   val_metric_to_monitor: val/iou
   enable_ema: false
   ema_momentum: 2e-3  # valid when enable_ema=true
+  enable_swa: false
+  swa_lr: 2e-4  # valid when enable_swa=true
+  swa_epoch_start: 90  # valid when enable_swa=true

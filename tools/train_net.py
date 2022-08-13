@@ -5,6 +5,7 @@ import shutil
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
+from pytorch_lightning.callbacks import StochasticWeightAveraging as SWA
 from pytorch_lightning.loggers import TensorBoardLogger
 
 # isort: off
@@ -100,9 +101,13 @@ def main() -> None:
     lr_monitor_callback = LearningRateMonitor(logging_interval='epoch')
     callbacks = [checkpoint_callback, lr_monitor_callback]
 
+    assert (not config.General.enable_ema) or (not config.General.enable_swa)
     if config.General.enable_ema:
         print(f'enable EMA with momentum = {config.General.ema_momentum}')
         callbacks.append(EMA(decay=1-config.General.ema_momentum))
+    if config.General.enable_swa:
+        print(f'enable SWA with lr = {config.General.swa_lr} and epoch_start = {config.General.swa_epoch_start}')
+        callbacks.append(SWA(swa_epoch_start=config.General.swa_epoch_start, swa_lrs=config.General.swa_lr))
 
     loggers = [TensorBoardLogger(output_dir, name=None)]
     if (not args.dry) and (not args.disable_wandb):
