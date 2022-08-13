@@ -51,6 +51,10 @@ def parse_args() -> argparse.Namespace:
         default=[]
     )
     parser.add_argument(
+        '--use_ema_weight',
+        action='store_true'
+    )
+    parser.add_argument(
         'opts',
         default=None,
         nargs=argparse.REMAINDER,
@@ -138,7 +142,13 @@ def main():
 
     model = get_model(config)
     ckpt_path = os.path.join(args.artifact_dir, f'models/exp_{args.exp_id:05d}/best.ckpt')
-    model.load_state_dict(torch.load(ckpt_path, map_location=torch.device('cpu'))['state_dict'])
+    state_dict = torch.load(ckpt_path, map_location=torch.device('cpu'))
+    if args.use_ema_weight:
+        print('using EMA weight')
+        state_dict = state_dict['callbacks']['EMA']['ema_state_dict']
+    else:
+        state_dict = state_dict['state_dict']
+    model.load_state_dict(state_dict)
     model.to(args.device)
     model.eval()
 
