@@ -230,7 +230,11 @@ class Model(pl.LightningModule):
 
         return {
             'optimizer': optimizer,
-            'lr_scheduler': {'scheduler': lr_scheduler, 'interval': 'epoch', 'name': 'lr'}
+            'lr_scheduler': {
+                'scheduler': lr_scheduler,
+                'interval': 'epoch',
+                # 'name': 'lr'
+            }
         }
 
 
