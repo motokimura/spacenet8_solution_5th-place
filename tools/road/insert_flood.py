@@ -361,6 +361,7 @@ def remove_duplicate_linestring_section(df):
 
 def main():
     args = parse_args()
+    print(f'flood_thresh = {args.flood_thresh}')
 
     cols = ['ImageId', 'Object', 'WKT_Pix', 'WKT_Geo', 'Flooded', 'length_m']  # 'travel_time_s' will be added later
     df = pd.DataFrame(columns=cols)

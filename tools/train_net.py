@@ -101,7 +101,7 @@ def main() -> None:
     callbacks = [checkpoint_callback, lr_monitor_callback]
 
     if config.General.enable_ema:
-        print(f'enable EMA with momentum={config.General.ema_momentum}')
+        print(f'enable EMA with momentum = {config.General.ema_momentum}')
         callbacks.append(EMA(decay=1-config.General.ema_momentum))
 
     loggers = [TensorBoardLogger(output_dir, name=None)]
