@@ -1,6 +1,7 @@
 ## Launch EC2 instance
 
-Use `Deep Learning AMI GPU PyTorch 1.12.0 (Ubuntu 20.04) 20220803`.
+Tested with `Deep Learning AMI GPU PyTorch 1.12.0 (Ubuntu 20.04) 20220803` and
+`Deep Learning AMI GPU PyTorch 1.12.0 (Amazon Linux 2) 20220803` AMI.
 
 ## Download SpaceNet-8 dataset
 
@@ -11,7 +12,7 @@ mkdir ~/.aws
 nano ~/.aws/credentials  # write your credentials at [default] section
 ```
 
-Install AWS-CLI.
+Install AWS-CLI (can be skipped if Amazon Linux 2 AMI is used).
 
 ```
 sudo apt install -y awscli
