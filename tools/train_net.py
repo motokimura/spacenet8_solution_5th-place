@@ -27,7 +27,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         '--exp_id',
         type=int,
-        default=9999
+        default=99999
     )
     parser.add_argument(
         '--fold_id',
