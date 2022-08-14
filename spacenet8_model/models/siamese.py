@@ -26,6 +26,24 @@ class SiameseModel(torch.nn.Module):
         branch_out_channels = self.branch.segmentation_head[0].in_channels
         self.branch.segmentation_head[0] = torch.nn.Identity()
 
+        # post head
+        if config.Model.enable_siamese_post_head:
+            kernel_size = config.Model.post_head_kernel_size
+            padding = (kernel_size - 1) // 2
+            if config.Model.post_head_module == 'conv':
+                self.post_head = [torch.nn.Conv2d(
+                    branch_out_channels,
+                    branch_out_channels,
+                    kernel_size=kernel_size,
+                    stride=1,
+                    padding=padding) for i in range(config.Model.n_post_head_modules)
+                ]
+                self.post_head = torch.nn.Sequential(*head)
+            else:
+                raise ValueError(config.Model.n_post_head_modules)
+        else:
+            self.post_head = torch.nn.Identity()
+
         # siamese head
         head_in_channels = branch_out_channels * (1 + config.Model.n_input_post_images)
         kernel_size = config.Model.siamese_head_kernel_size
@@ -76,6 +94,6 @@ class SiameseModel(torch.nn.Module):
 
         x = [self.branch(image)]
         for i in range(self.n_input_post_images):
-            x.append(self.branch(images_post[i]))
+            x.append(self.post_head(self.branch(images_post[i])))
         x = torch.cat(x, dim=1)
         return self.head(x)

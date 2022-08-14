@@ -261,6 +261,17 @@ def load_pretrained_siamese_branch(model, config, pretrained_exp_id):
     assert len(imcompatible_keys.unexpected_keys) == 0, imcompatible_keys.unexpected_keys
 
     expected_missing_keys = []
+
+    # post head
+    if config.Model.enable_siamese_post_head:
+        for i in range(config.Model.n_post_head_modules):
+            if config.Model.post_head_module == 'conv':
+                expected_missing_keys.append(f'model.post_head.{i}.weight')
+                expected_missing_keys.append(f'model.post_head.{i}.bias')
+            else:
+                raise ValueError(config.Model.post_head_module)
+
+    # siamese head
     head_module = config.Model.siamese_head_module
     for i in range(config.Model.n_siamese_head_convs - 1):
         if head_module == 'conv':
@@ -278,7 +289,7 @@ def load_pretrained_siamese_branch(model, config, pretrained_exp_id):
             expected_missing_keys.append(f'model.head.{i}.1.running_var')
         else:
             raise ValueError(head_module)
-    # final conv
+    # siamese head final conv
     expected_missing_keys.append(f'model.head.{config.Model.n_siamese_head_convs - 1}.weight')
     expected_missing_keys.append(f'model.head.{config.Model.n_siamese_head_convs - 1}.bias')
     assert set(imcompatible_keys.missing_keys) == set(expected_missing_keys), (imcompatible_keys.missing_keys, expected_missing_keys)
