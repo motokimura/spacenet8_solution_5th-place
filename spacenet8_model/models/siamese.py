@@ -39,6 +39,8 @@ class SiameseModel(torch.nn.Module):
                     padding=padding) for i in range(config.Model.n_post_head_modules)
                 ]
                 self.post_head = torch.nn.Sequential(*self.post_head)
+            elif config.Model.post_head_module == 'average_pool':
+                self.post_head = torch.nn.AvgPool2d(kernel_size=kernel_size, stride=1, padding=padding)
             else:
                 raise ValueError(config.Model.n_post_head_modules)
         else:

@@ -268,6 +268,8 @@ def load_pretrained_siamese_branch(model, config, pretrained_exp_id):
             if config.Model.post_head_module == 'conv':
                 expected_missing_keys.append(f'model.post_head.{i}.weight')
                 expected_missing_keys.append(f'model.post_head.{i}.bias')
+            elif config.Model.post_head_module == 'average_pool':
+                pass
             else:
                 raise ValueError(config.Model.post_head_module)
 
