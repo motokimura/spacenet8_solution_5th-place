@@ -55,6 +55,10 @@ def parse_args() -> argparse.Namespace:
         action='store_true'
     )
     parser.add_argument(
+        '--use_swa_weight',
+        action='store_true'
+    )
+    parser.add_argument(
         'opts',
         default=None,
         nargs=argparse.REMAINDER,
@@ -137,11 +141,17 @@ def prepare_test_dataloaders(config, args):
 
 def main():
     args = parse_args()
+    assert (not args.use_ema_weight) or (not args.use_swa_weight)
 
     config: DictConfig = load_test_config(args)
 
     model = get_model(config)
-    ckpt_path = os.path.join(args.artifact_dir, f'models/exp_{args.exp_id:05d}/best.ckpt')
+
+    ckpt_fn = 'best.ckpt'
+    if args.use_swa_weight:
+        print('using SWA weight')
+        ckpt_fn = 'last.ckpt'
+    ckpt_path = os.path.join(args.artifact_dir, f'models/exp_{args.exp_id:05d}', ckpt_fn)
     state_dict = torch.load(ckpt_path, map_location=torch.device('cpu'))
     if args.use_ema_weight:
         print('using EMA weight')
