@@ -1,0 +1,13 @@
+Dataloader:
+  train_batch_size: 8
+Transform:
+  train_random_crop_size: [448, 448]
+Model:
+  encoder: timm-efficientnet-b6
+General:
+  epochs: 280
+  enable_swa: true
+  swa_lr: 5e-5
+  swa_epoch_start: 210
+Scheduler:
+  multistep_milestones: [120, 180]
