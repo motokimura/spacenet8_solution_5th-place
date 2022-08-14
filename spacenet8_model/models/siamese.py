@@ -36,11 +36,24 @@ class SiameseModel(torch.nn.Module):
                     branch_out_channels,
                     kernel_size=kernel_size,
                     stride=1,
-                    padding=padding) for i in range(config.Model.n_post_head_modules)
+                    padding=padding) for _ in range(config.Model.n_post_head_modules)
+                ]
+                self.post_head = torch.nn.Sequential(*self.post_head)
+            elif config.Model.post_head_module in ['conv_relu', 'conv_bn_relu']:
+                use_batchnorm = config.Model.post_head_module == 'conv_bn_relu'
+                self.post_head = [Conv2dReLU(
+                    branch_out_channels,
+                    branch_out_channels,
+                    kernel_size=kernel_size,
+                    stride=1,
+                    padding=padding,
+                    use_batchnorm=use_batchnorm) for _ in range(config.Model.n_post_head_modules)
                 ]
                 self.post_head = torch.nn.Sequential(*self.post_head)
             elif config.Model.post_head_module == 'average_pool':
                 self.post_head = torch.nn.AvgPool2d(kernel_size=kernel_size, stride=1, padding=padding)
+            elif config.Model.post_head_module == 'max_pool':
+                self.post_head = torch.nn.MaxPool2d(kernel_size=kernel_size, stride=1, padding=padding)
             else:
                 raise ValueError(config.Model.n_post_head_modules)
         else:

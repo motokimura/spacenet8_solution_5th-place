@@ -268,7 +268,19 @@ def load_pretrained_siamese_branch(model, config, pretrained_exp_id):
             if config.Model.post_head_module == 'conv':
                 expected_missing_keys.append(f'model.post_head.{i}.weight')
                 expected_missing_keys.append(f'model.post_head.{i}.bias')
+            elif config.Model.post_head_module == 'conv_relu':
+                expected_missing_keys.append(f'model.post_head.{i}.0.weight')
+                expected_missing_keys.append(f'model.post_head.{i}.0.bias')
+            elif config.Model.post_head_module == 'conv_bn_relu':
+                expected_missing_keys.append(f'model.post_head.{i}.0.weight')
+                # bn
+                expected_missing_keys.append(f'model.post_head.{i}.1.weight')
+                expected_missing_keys.append(f'model.post_head.{i}.1.bias')
+                expected_missing_keys.append(f'model.post_head.{i}.1.running_mean')
+                expected_missing_keys.append(f'model.post_head.{i}.1.running_var')
             elif config.Model.post_head_module == 'average_pool':
+                pass
+            elif config.Model.post_head_module == 'max_pool':
                 pass
             else:
                 raise ValueError(config.Model.post_head_module)
