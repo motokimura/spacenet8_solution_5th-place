@@ -7,9 +7,6 @@ Transform:
 Model:
   encoder: timm-efficientnet-b5
   siamese_head_kernel_size: 7
-Scheduler:
-  multistep_milestones: [80]  # same as default. need to adjust?
 General:
-  epochs: 120  # same as default. need to adjust?
   enable_ema: true
-  ema_momentum: 2e-3  # higher (< 1e-3) might be better.
+  ema_momentum: 2e-3

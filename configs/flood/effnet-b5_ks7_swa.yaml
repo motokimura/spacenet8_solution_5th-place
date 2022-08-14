@@ -12,5 +12,5 @@ Scheduler:
 General:
   epochs: 120
   enable_swa: true
-  swa_lr: 1e-4  # lower (> 1e-5) might be better.
+  swa_lr: 1e-4
   swa_epoch_start: 90
