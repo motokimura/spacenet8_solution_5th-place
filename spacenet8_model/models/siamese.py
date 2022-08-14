@@ -38,7 +38,7 @@ class SiameseModel(torch.nn.Module):
                     stride=1,
                     padding=padding) for i in range(config.Model.n_post_head_modules)
                 ]
-                self.post_head = torch.nn.Sequential(*head)
+                self.post_head = torch.nn.Sequential(*self.post_head)
             else:
                 raise ValueError(config.Model.n_post_head_modules)
         else:
