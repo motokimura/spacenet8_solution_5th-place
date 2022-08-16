@@ -1,9 +1,9 @@
 #!/bin/bash
-# example usage: ./scripts/this_script.sh foundation 0 --config path/to/config General.seed=1000
+# example usage: ./scripts/this_script.sh 0 --config path/to/config General.seed=1000
 
-TASK=$1
-EXP_ID=$2
-TRAIN_ARGS=${@:3}
+TASK=foundation
+EXP_ID=$1
+TRAIN_ARGS=${@:2}
 
 echo TASK: $TASK
 echo EXP_ID: $EXP_ID

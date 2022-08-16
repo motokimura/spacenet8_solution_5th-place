@@ -1,10 +1,10 @@
 #!/bin/bash
-# example usage: ./scripts/this_script.sh flood 1000 0 --config path/to/config General.seed=1000
+# example usage: ./scripts/this_script.sh 1000 0 --config path/to/config General.seed=1000
 
-TASK=$1
-EXP_ID=$2
-PRETRAINED_ID=$3
-TRAIN_ARGS=${@:4}
+TASK=flood
+EXP_ID=$1
+PRETRAINED_ID=$2
+TRAIN_ARGS=${@:3}
 
 echo TASK: $TASK
 echo EXP_ID: $EXP_ID
