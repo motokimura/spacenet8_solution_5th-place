@@ -1,7 +1,7 @@
 #!/bin/bash
 # example usage: ./scripts/this_script.sh 0 0 1000 0 --config path/to/config General.seed=1000
 
-TASK=foundation
+TASK=flood
 GPU_ID=$1
 FOLD_ID=$2
 EXP_ID=$3
