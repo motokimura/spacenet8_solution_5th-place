@@ -72,7 +72,7 @@ Open Source Resources, Frameworks and Libraries used by this solution.
     [https://github.com/geopandas/geopandas](https://github.com/geopandas/geopandas),
     BSD 3-Clause License
 
-### CNN model development (experiment management)
+### CNN model development (experiment management):
 
 -   OmegaConf,
     [https://github.com/omry/omegaconf](https://github.com/omry/omegaconf),
@@ -102,7 +102,7 @@ Open Source Resources, Frameworks and Libraries used by this solution.
     [https://github.com/theskumar/python-dotenv](https://github.com/theskumar/python-dotenv),
     BSD 3-Clause License
 
-### Others
+### Others:
 
 -   NumPy,
     [https://numpy.org/](https://numpy.org/),
