@@ -13,6 +13,8 @@ def parse_args():
     parser.add_argument('--test_dir', default='/data/test')
     parser.add_argument('--artifact_dir', default='/wdata')
     parser.add_argument('--fold_ver', default='folds_v3')
+    parser.add_argument('--train_only', action='store_true')
+    parser.add_argument('--test_only', action='store_true')
     return parser.parse_args()
 
 
@@ -100,11 +102,14 @@ def process_mosaic(args):
 def main():
     args = parse_args()
 
-    process_test(args)
+    assert (not args.train_only) or (not args.test_only), (args.train_only, args.test_only)
 
-    process_train_val(args)
+    if not args.train_only:
+        process_test(args)
 
-    process_mosaic(args)
+    if not args.test_only:
+        process_train_val(args)
+        process_mosaic(args)
 
 
 if __name__ == '__main__':
