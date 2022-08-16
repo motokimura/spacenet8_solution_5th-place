@@ -10,6 +10,7 @@ def parse_args():
     parser.add_argument('--road', required=True)
     parser.add_argument('--artifact_dir', default='/wdata')
     parser.add_argument('--val', action='store_true')
+    parser.add_argument('--out')
     return parser.parse_args()
 
 
@@ -44,6 +45,10 @@ def main():
     out_path = os.path.join(out_dir, 'solution.csv')
     df.to_csv(out_path, index=False)
     print(f'saved {out_path}')
+
+    if args.out is not None:
+        df.to_csv(args.out, index=False)
+        print(f'saved {args.out}')
 
 
 if __name__ == '__main__':
