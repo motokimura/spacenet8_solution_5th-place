@@ -10,3 +10,6 @@ Model:
 General:
   enable_ema: true
   ema_momentum: 2e-3
+  epochs: 160
+Scheduler:
+  multistep_milestones: [10000]  # constant lr
