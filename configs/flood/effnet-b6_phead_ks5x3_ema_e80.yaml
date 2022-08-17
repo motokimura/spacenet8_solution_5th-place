@@ -5,7 +5,7 @@ Dataloader:
 Transform:
   train_random_crop_size: [320, 320]
 Model:
-  encoder: timm-efficientnet-b5
+  encoder: timm-efficientnet-b6
   n_siamese_head_convs: 1
   siamese_head_kernel_size_last: 3
   enable_siamese_post_head: true
