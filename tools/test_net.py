@@ -59,6 +59,8 @@ def parse_args() -> argparse.Namespace:
         action='store_true'
     )
     parser.add_argument(
+        '--override_model_dir')
+    parser.add_argument(
         'opts',
         default=None,
         nargs=argparse.REMAINDER,
@@ -67,7 +69,8 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_test_config(args):
-    config_exp_path = os.path.join(args.artifact_dir, f'models/exp_{args.exp_id:05d}/config.yaml')
+    model_dir = os.path.join(args.artifact_dir, 'models') if (args.override_model_dir is None) else args.override_model_dir
+    config_exp_path = os.path.join(model_dir, f'exp_{args.exp_id:05d}/config.yaml')
     config_exp: DictConfig = OmegaConf.load(config_exp_path)
     task: str = config_exp.task
 
@@ -145,13 +148,14 @@ def main():
 
     config: DictConfig = load_test_config(args)
 
-    model = get_model(config)
+    model_dir = os.path.join(args.artifact_dir, 'models') if (args.override_model_dir is None) else args.override_model_dir
+    model = get_model(config, model_dir)
 
     ckpt_fn = 'best.ckpt'
     if args.use_swa_weight:
         print('using SWA weight')
         ckpt_fn = 'last.ckpt'
-    ckpt_path = os.path.join(args.artifact_dir, f'models/exp_{args.exp_id:05d}', ckpt_fn)
+    ckpt_path = os.path.join(model_dir, f'exp_{args.exp_id:05d}', ckpt_fn)
     state_dict = torch.load(ckpt_path, map_location=torch.device('cpu'))
     if args.use_ema_weight:
         print('using EMA weight')

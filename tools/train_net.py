@@ -49,6 +49,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         '--disable_wandb', action='store_true', help='disable W&B logger')
     parser.add_argument(
+        '--override_model_dir')
+    parser.add_argument(
+        '--artifact_dir',
+        default='/wdata'
+    )
+    parser.add_argument(
         'opts',
         default=None,
         nargs=argparse.REMAINDER,
@@ -81,8 +87,9 @@ def main() -> None:
 
     seed_everything(config.General.seed + config.fold_id * 5555)
 
+    model_dir = os.path.join(args.artifact_dir, 'models') if (args.override_model_dir is None) else args.override_model_dir
     output_dir = '_dry' if args.dry else f'exp_{args.exp_id:05d}'
-    output_dir = os.path.join(config.Data.artifact_dir, 'models', output_dir)
+    output_dir = os.path.join(model_dir, output_dir)
     if args.dry:
         shutil.rmtree(output_dir, ignore_errors=True)
     os.makedirs(output_dir, exist_ok=False)
@@ -130,7 +137,7 @@ def main() -> None:
         limit_val_batches=2 if args.dry else 1.0,
     )
 
-    model = get_model(config, pretrained_exp_id=args.pretrained)
+    model = get_model(config, model_dir, pretrained_exp_id=args.pretrained)
 
     train_dataloader = get_dataloader(config, is_train=True)
     val_dataloader = get_dataloader(config, is_train=False)
