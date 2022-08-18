@@ -20,7 +20,7 @@ FLOOD_ARGS=" --use_ema_weight --tta_hflip_channels 0 --override_model_dir /work/
 echo ""
 echo "predicting... (1/5)"
 echo "this will take ~6 min"
-echo "you can check progress from ${TEST_DIR}/*.txt"
+echo "you can check progress from $LOG_DIR/*.txt"
 
 nohup env CUDA_VISIBLE_DEVICES=0 python tools/test_net.py \
     --exp_id 50000 \
@@ -47,7 +47,7 @@ wait
 echo ""
 echo "predicting... (2/5)"
 echo "this will take ~6 min"
-echo "you can check progress from ${TEST_DIR}/*.txt"
+echo "you can check progress from $LOG_DIR/*.txt"
 
 nohup env CUDA_VISIBLE_DEVICES=0 python tools/test_net.py \
     --exp_id 50004 \
@@ -74,7 +74,7 @@ wait
 echo ""
 echo "predicting... (3/5)"
 echo "this will take ~6 min"
-echo "you can check progress from ${TEST_DIR}/*.txt"
+echo "you can check progress from $LOG_DIR/*.txt"
 
 nohup env CUDA_VISIBLE_DEVICES=0 python tools/test_net.py \
     --exp_id 60403 \
@@ -101,7 +101,7 @@ wait
 echo ""
 echo "predicting... (4/5)"
 echo "this will take ~6 min"
-echo "you can check progress from ${TEST_DIR}/*.txt"
+echo "you can check progress from $LOG_DIR/*.txt"
 
 nohup env CUDA_VISIBLE_DEVICES=0 python tools/test_net.py \
     --exp_id 50012 \
@@ -128,7 +128,7 @@ wait
 echo ""
 echo "predicting... (5/5)"
 echo "this will take ~6 min"
-echo "you can check progress from ${TEST_DIR}/*.txt"
+echo "you can check progress from $LOG_DIR/*.txt"
 
 nohup env CUDA_VISIBLE_DEVICES=0 python tools/test_net.py \
     --exp_id 60421 \
