@@ -2,8 +2,8 @@
 
 START_TIME=$SECONDS
 
-TEST_DIR=$2
-OUT_PATH=$3
+TEST_DIR=$1
+OUT_PATH=$2
 
 # preprocess
 python tools/make_test_csv.py --test_dir $TEST_DIR
