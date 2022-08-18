@@ -153,8 +153,8 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/test_net.py \
 wait
 
 # ensemble
-python tools/ensemble.py --exp_id 50000 50001 50002 50003 50004 60400 60401 60402 60403 60404
-python tools/ensemble.py --exp_id 50010 50011 50012 50013 50014 60420 60421 60422 60423 60424
+python tools/ensemble.py --exp_id 50000 50001 50002 50003 50004 60400 60401 60402 60403 60404 --root_dir $TEST_DIR
+python tools/ensemble.py --exp_id 50010 50011 50012 50013 50014 60420 60421 60422 60423 60424 --root_dir $TEST_DIR
 
 # postprocess
 FOUNDATION_DIR="exp_50000-50001-50002-50003-50004-60400-60401-60402-60403-60404"
