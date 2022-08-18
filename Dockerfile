@@ -58,7 +58,7 @@ RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_60421.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_60422.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_60423.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_60424.zip
-RUN unzip "*.zip"
+RUN unzip "*.zip" && rm -f *.zip
 
 ENV PYTHONPATH $PYTHONPATH:/work
 
