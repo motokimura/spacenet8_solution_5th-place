@@ -156,6 +156,7 @@ def main():
         print('using SWA weight')
         ckpt_fn = 'last.ckpt'
     ckpt_path = os.path.join(model_dir, f'exp_{args.exp_id:05d}', ckpt_fn)
+    print(f'loading {ckpt_path}')
     state_dict = torch.load(ckpt_path, map_location=torch.device('cpu'))
     if args.use_ema_weight:
         print('using EMA weight')
