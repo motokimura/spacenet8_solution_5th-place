@@ -189,7 +189,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
     --exp_id 60420 \
     --pretrained 60400 \
     --fold_id 0 \
-    --config configs/flood/effnet-b6_ks7_ema.yaml \
+    --config configs/flood/effnet-b6_ks7_ema_e80.yaml \
     $ARGS \
     > $LOG_DIR/exp_60420.txt 2>&1 &
 
@@ -205,7 +205,7 @@ nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --exp_id 60421 \
     --pretrained 60401 \
     --fold_id 1 \
-    --config configs/flood/effnet-b6_ks7_ema.yaml \
+    --config configs/flood/effnet-b6_ks7_ema_e80.yaml \
     $ARGS \
     > $LOG_DIR/exp_60421.txt 2>&1 &
 
@@ -214,7 +214,7 @@ nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
     --exp_id 60422 \
     --pretrained 60402 \
     --fold_id 2 \
-    --config configs/flood/effnet-b6_ks7_ema.yaml \
+    --config configs/flood/effnet-b6_ks7_ema_e80.yaml \
     $ARGS \
     > $LOG_DIR/exp_60422.txt 2>&1 &
 
@@ -223,7 +223,7 @@ nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
     --exp_id 60423 \
     --pretrained 60403 \
     --fold_id 3 \
-    --config configs/flood/effnet-b6_ks7_ema.yaml \
+    --config configs/flood/effnet-b6_ks7_ema_e80.yaml \
     $ARGS \
     > $LOG_DIR/exp_60423.txt 2>&1 &
 
@@ -232,7 +232,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
     --exp_id 60424 \
     --pretrained 60404 \
     --fold_id 4 \
-    --config configs/flood/effnet-b6_ks7_ema.yaml \
+    --config configs/flood/effnet-b6_ks7_ema_e80.yaml \
     $ARGS \
     > $LOG_DIR/exp_60424.txt 2>&1 &
 
