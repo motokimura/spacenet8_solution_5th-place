@@ -3,7 +3,7 @@ Dataloader:
   val_batch_size: 4
   test_batch_size: 4
 Transform:
-  train_random_crop_size: [448, 448]
+  train_random_crop_size: [384, 384]
 Model:
   encoder: timm-efficientnet-b6
   siamese_head_kernel_size: 9
