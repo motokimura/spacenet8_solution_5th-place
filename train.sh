@@ -4,7 +4,7 @@ START_TIME=$SECONDS
 
 TRAIN_DIR=$1
 
-# remove motokimura"s home-built models
+# remove motokimura's home-built models
 rm -rf /work/models
 
 # preprocess
@@ -29,9 +29,9 @@ python tools/measure_image_similarities.py --train_dir $TRAIN_DIR --train_only
 LOG_DIR=/wdata/logs/train
 mkdir -p $LOG_DIR
 
-ARGS=" --override_model_dir /work/models --disable_wandb"
+ARGS=" --override_model_dir /work/models --disable_wandb Data.train_dir=$TRAIN_DIR"
 # comment out the line below for dryrun
-#ARGS=$ARGS" General.epochs=5"
+#ARGS=$ARGS" General.epochs=2"
 
 echo ""
 echo "training... (1/5)"
@@ -184,14 +184,14 @@ nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/exp_50014.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=4 python tools/train_net.py \
+nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
     --task flood \
     --exp_id 60420 \
     --pretrained 60400 \
     --fold_id 0 \
     --config configs/flood/effnet-b6_ks7_ema.yaml \
     $ARGS \
-    > $LOG_DIR/60420.txt 2>&1 &
+    > $LOG_DIR/exp_60420.txt 2>&1 &
 
 wait
 
@@ -207,7 +207,7 @@ nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --fold_id 1 \
     --config configs/flood/effnet-b6_ks7_ema.yaml \
     $ARGS \
-    > $LOG_DIR/60421.txt 2>&1 &
+    > $LOG_DIR/exp_60421.txt 2>&1 &
 
 nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
     --task flood \
@@ -216,7 +216,7 @@ nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
     --fold_id 2 \
     --config configs/flood/effnet-b6_ks7_ema.yaml \
     $ARGS \
-    > $LOG_DIR/60422.txt 2>&1 &
+    > $LOG_DIR/exp_60422.txt 2>&1 &
 
 nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
     --task flood \
@@ -225,7 +225,7 @@ nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
     --fold_id 3 \
     --config configs/flood/effnet-b6_ks7_ema.yaml \
     $ARGS \
-    > $LOG_DIR/60423.txt 2>&1 &
+    > $LOG_DIR/exp_60423.txt 2>&1 &
 
 nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
     --task flood \
@@ -234,7 +234,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
     --fold_id 4 \
     --config configs/flood/effnet-b6_ks7_ema.yaml \
     $ARGS \
-    > $LOG_DIR/60424.txt 2>&1 &
+    > $LOG_DIR/exp_60424.txt 2>&1 &
 
 wait
 
