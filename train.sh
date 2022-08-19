@@ -4,7 +4,7 @@ START_TIME=$SECONDS
 
 TRAIN_DIR=$1
 
-# remove motokimura"s home-built models
+# remove motokimura's home-built models
 rm -rf /work/models
 
 # preprocess
