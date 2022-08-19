@@ -29,7 +29,7 @@ python tools/measure_image_similarities.py --train_dir $TRAIN_DIR --train_only
 LOG_DIR=/wdata/logs/train
 mkdir -p $LOG_DIR
 
-ARGS=" --override_model_dir /work/models --disable_wandb"
+ARGS=" --override_model_dir /work/models --disable_wandb Data.train_dir=$TRAIN_DIR"
 # comment out the line below for dryrun
 ARGS=$ARGS" General.epochs=2"
 
