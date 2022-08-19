@@ -31,7 +31,7 @@ mkdir -p $LOG_DIR
 
 ARGS=" --override_model_dir /work/models --disable_wandb"
 # comment out the line below for dryrun
-#ARGS=$ARGS" General.epochs=5"
+ARGS=$ARGS" General.epochs=2"
 
 echo ""
 echo "training... (1/5)"
@@ -46,7 +46,9 @@ nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/exp_50000.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task foundation \
     --exp_id 50001 \
     --fold_id 1 \
@@ -54,7 +56,9 @@ nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/exp_50001.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task foundation \
     --exp_id 50002 \
     --fold_id 2 \
@@ -62,7 +66,9 @@ nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/exp_50002.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task foundation \
     --exp_id 50003 \
     --fold_id 3 \
@@ -85,7 +91,9 @@ nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/exp_50004.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task foundation \
     --exp_id 60400 \
     --fold_id 0 \
@@ -93,7 +101,9 @@ nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/exp_60400.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task foundation \
     --exp_id 60401 \
     --fold_id 1 \
@@ -101,7 +111,9 @@ nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/exp_60401.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task foundation \
     --exp_id 60402 \
     --fold_id 2 \
@@ -124,7 +136,9 @@ nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/exp_60403.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task foundation \
     --exp_id 60404 \
     --fold_id 4 \
@@ -132,7 +146,9 @@ nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/exp_60404.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task flood \
     --exp_id 50010 \
     --pretrained 50000 \
@@ -141,7 +157,9 @@ nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/exp_50010.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task flood \
     --exp_id 50011 \
     --pretrained 50001 \
@@ -166,7 +184,9 @@ nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/exp_50012.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task flood \
     --exp_id 50013 \
     --pretrained 50003 \
@@ -175,7 +195,9 @@ nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/exp_50013.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task flood \
     --exp_id 50014 \
     --pretrained 50004 \
@@ -183,6 +205,8 @@ nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
     --config configs/flood/effnet-b5_ks7_ema_e80.yaml \
     $ARGS \
     > $LOG_DIR/exp_50014.txt 2>&1 &
+
+wait
 
 nohup env CUDA_VISIBLE_DEVICES=4 python tools/train_net.py \
     --task flood \
@@ -209,7 +233,9 @@ nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/60421.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task flood \
     --exp_id 60422 \
     --pretrained 60402 \
@@ -218,7 +244,9 @@ nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/60422.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task flood \
     --exp_id 60423 \
     --pretrained 60403 \
@@ -227,7 +255,9 @@ nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
     $ARGS \
     > $LOG_DIR/60423.txt 2>&1 &
 
-nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
+wait
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
     --task flood \
     --exp_id 60424 \
     --pretrained 60404 \
