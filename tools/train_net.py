@@ -1,6 +1,7 @@
 import argparse
 import os
 import shutil
+import ssl
 
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Trainer, seed_everything
@@ -15,6 +16,8 @@ from spacenet8_model.utils.ema import EMA
 from spacenet8_model.utils.config import load_config
 from spacenet8_model.utils.wandb import get_wandb_logger
 # isort: on
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 
 def parse_args() -> argparse.Namespace:
