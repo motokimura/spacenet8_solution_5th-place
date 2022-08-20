@@ -29,7 +29,7 @@ def ensemble(pre_image_info, args):
         pred_path = os.path.join(args.artifact_dir, 'preds', f'exp_{exp_id:05d}', aoi, pre_fn)
         pred = io.imread(pred_path).astype(float)
 
-        if len(pred.shape) == 1:
+        if len(pred.shape) == 2:
             pred = pred[:, :, np.newaxis]
 
         if i == 0:
