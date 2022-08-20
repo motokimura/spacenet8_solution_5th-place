@@ -54,7 +54,7 @@ Class:
     road: [1.0, 1.0]
 Optimizer:
   type: adam
-  lr: 2e-5
+  lr: 1e-5
   weight_decay: 0
 Scheduler:
   type: multistep
