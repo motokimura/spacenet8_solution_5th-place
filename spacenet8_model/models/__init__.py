@@ -10,17 +10,17 @@ from omegaconf import DictConfig
 from spacenet8_model.models.losses import Loss
 from spacenet8_model.models.seg import SegmentationModel
 from spacenet8_model.models.siamese import SiameseModel
-from spacenet8_model.models.xd_xd_sn5.resnet import Resnet50_upsample
-from spacenet8_model.models.xd_xd_sn5.senet import SeResnext50_32x4d_upsample
+from spacenet8_model.models.xdxd_sn5.resnet import Resnet50_upsample
+from spacenet8_model.models.xdxd_sn5.senet import SeResnext50_32x4d_upsample
 from spacenet8_model.utils.misc import get_flatten_classes
 # isort: on
 
 
-def get_model(config: DictConfig, model_dir: str, pretrained_exp_id: int = -1, pretrained_xd_xd_sn5_path: str = None) -> torch.nn.Module:
+def get_model(config: DictConfig, model_dir: str, pretrained_exp_id: int = -1, pretrained_xdxd_sn5_path: str = None) -> torch.nn.Module:
     kwargs = {
         # TODO: map config parameters to kwargs based on the architecture
     }
-    model = Model(config, pretrained_xd_xd_sn5_path, **kwargs)
+    model = Model(config, pretrained_xdxd_sn5_path, **kwargs)
 
     if pretrained_exp_id >= 0:
         model = load_pretrained_siamese_branch(model, config, model_dir, pretrained_exp_id)
@@ -29,7 +29,7 @@ def get_model(config: DictConfig, model_dir: str, pretrained_exp_id: int = -1, p
 
 
 class Model(pl.LightningModule):
-    def __init__(self, config, pretrained_xd_xd_sn5_path, **kwargs):
+    def __init__(self, config, pretrained_xdxd_sn5_path, **kwargs):
         assert config.Model.n_input_post_images in [0, 1, 2], config.Model.n_input_post_images
         assert config.Model.type in ['seg', 'siamese', 'xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a'], config.Model.type
 
@@ -43,19 +43,19 @@ class Model(pl.LightningModule):
 
         elif config.Model.type == 'xdxd_sn5_serx50_focal':
             self.model = SeResnext50_32x4d_upsample(num_channels=3, num_classes=8)
-            if pretrained_xd_xd_sn5_path is not None:
-                print(f'loading {pretrained_xd_xd_sn5_path}')
-                state_dict = torch.load(pretrained_xd_xd_sn5_path, map_location='cpu')
+            if pretrained_xdxd_sn5_path is not None:
+                print(f'loading {pretrained_xdxd_sn5_path}')
+                state_dict = torch.load(pretrained_xdxd_sn5_path, map_location='cpu')
                 self.model.load_state_dict(state_dict)
-                self.model = remove_xd_xd_sn5_redundant_out_channels(self.model)
+                self.model = remove_xdxd_sn5_redundant_out_channels(self.model)
 
         elif config.Model.type == 'xdxd_sn5_r50a':
             self.model = Resnet50_upsample(num_channels=3, num_classes=8)
-            if pretrained_xd_xd_sn5_path is not None:
-                print(f'loading {pretrained_xd_xd_sn5_path}')
-                state_dict = torch.load(pretrained_xd_xd_sn5_path, map_location='cpu')
+            if pretrained_xdxd_sn5_path is not None:
+                print(f'loading {pretrained_xdxd_sn5_path}')
+                state_dict = torch.load(pretrained_xdxd_sn5_path, map_location='cpu')
                 self.model.load_state_dict(state_dict)
-                self.model = remove_xd_xd_sn5_redundant_out_channels(self.model)
+                self.model = remove_xdxd_sn5_redundant_out_channels(self.model)
 
         # model parameters to preprocess input image
         if config.Model.type in ['seg', 'siamese']:
@@ -341,7 +341,7 @@ def load_pretrained_siamese_branch(model, config, model_dir, pretrained_exp_id):
     return model
 
 
-def remove_xd_xd_sn5_redundant_out_channels(model):
+def remove_xdxd_sn5_redundant_out_channels(model):
     final_conv = model.final[-1]
 
     conv = torch.nn.Conv2d(

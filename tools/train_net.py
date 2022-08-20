@@ -41,7 +41,7 @@ def parse_args() -> argparse.Namespace:
         help='exp_id of pretrained siamese branch'
     )
     parser.add_argument(
-        '--pretrained_xd_xd_sn5'
+        '--pretrained_xdxd_sn5'
     )
     parser.add_argument(
         '--config',
@@ -142,7 +142,7 @@ def main() -> None:
         limit_val_batches=2 if args.dry else 1.0,
     )
 
-    model = get_model(config, model_dir, pretrained_exp_id=args.pretrained, pretrained_xd_xd_sn5_path=args.pretrained_xd_xd_sn5)
+    model = get_model(config, model_dir, pretrained_exp_id=args.pretrained, pretrained_xdxd_sn5_path=args.pretrained_xdxd_sn5)
 
     train_dataloader = get_dataloader(config, is_train=True)
     val_dataloader = get_dataloader(config, is_train=False)
