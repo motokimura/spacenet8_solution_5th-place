@@ -47,7 +47,7 @@ class Model(pl.LightningModule):
                 print(f'loading {pretrained_xdxd_sn5_path}')
                 state_dict = torch.load(pretrained_xdxd_sn5_path, map_location='cpu')
                 self.model.load_state_dict(state_dict)
-                self.model = remove_xdxd_sn5_redundant_out_channels(self.model)
+            self.model = remove_xdxd_sn5_redundant_out_channels(self.model)
 
         elif config.Model.type == 'xdxd_sn5_r50a':
             self.model = Resnet50_upsample(num_channels=3, num_classes=8)
@@ -55,7 +55,7 @@ class Model(pl.LightningModule):
                 print(f'loading {pretrained_xdxd_sn5_path}')
                 state_dict = torch.load(pretrained_xdxd_sn5_path, map_location='cpu')
                 self.model.load_state_dict(state_dict)
-                self.model = remove_xdxd_sn5_redundant_out_channels(self.model)
+            self.model = remove_xdxd_sn5_redundant_out_channels(self.model)
 
         # model parameters to preprocess input image
         if config.Model.type in ['seg', 'siamese']:
