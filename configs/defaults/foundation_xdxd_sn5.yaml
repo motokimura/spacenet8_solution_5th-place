@@ -54,17 +54,17 @@ Class:
     road: [1.0, 1.0]
 Optimizer:
   type: adam
-  lr: 1e-5
+  lr: 2e-5
   weight_decay: 0
 Scheduler:
   type: multistep
-  multistep_milestones: [50]
+  multistep_milestones: [80]
   multistep_gamma: 0.1
   annealing_t_max: 120
   annealing_eta_min: 0.0
 General:
   gpus: [0]
-  epochs: 75
+  epochs: 120
   fp16: true
   amp_backend: native # valid when fp16=true
   amp_level: null # valid when amp_backend=apex
