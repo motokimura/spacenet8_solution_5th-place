@@ -31,6 +31,13 @@ RUN chmod a+x /work/scripts/*.sh
 RUN chmod a+x /work/scripts/p3/*.sh
 RUN chmod a+x /work/*.sh
 
+# download selimsef's xView2 models (published under Apache 2.0 license)
+# https://github.com/selimsef/xview2_solution
+# https://github.com/selimsef/xview2_solution/releases/tag/0.0.1
+WORKDIR /work/selimsef_xview2_models
+RUN wget -nv https://github.com/selimsef/xview2_solution/releases/download/0.0.1/localization_densenet_unet_densenet161_3_0_best_dice
+RUN wget -nv https://github.com/selimsef/xview2_solution/releases/download/0.0.1/localization_densenet_unet_densenet161_3_1_best_dice
+
 # download XD_XD's SpaceNet-5 winning models
 # see prepare_sn5_XD_XD_models.md to know how I prepared these models
 WORKDIR /work/xdxd_sn5_models
