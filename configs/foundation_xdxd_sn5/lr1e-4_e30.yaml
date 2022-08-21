@@ -1,6 +1,0 @@
-Optimizer:
-  lr: 1e-4
-Scheduler:
-  multistep_milestones: [20]
-General:
-  epochs: 30
