@@ -31,6 +31,12 @@ RUN chmod a+x /work/scripts/*.sh
 RUN chmod a+x /work/scripts/p3/*.sh
 RUN chmod a+x /work/*.sh
 
+# download XD_XD's winning models
+# see prepare_sn5_XD_XD_models.md to see how I prepared these models
+WORKDIR /work/xdxd_sn5_models
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/xdxd_sn5_serx50_focal.zip
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/xdxd_sn5_r50a.zip
+
 # download motokimura's home-built models
 # these models are removed before training (see train.sh)
 WORKDIR /work/models
