@@ -19,6 +19,7 @@ def parse_args():
     parser.add_argument('--road', required=True)
     parser.add_argument('--weight', type=float, default=0.5)
     parser.add_argument('--artifact_dir', default='/wdata')
+    parser.add_argument('--val', action='store_true')
     return parser.parse_args()
 
 
@@ -44,7 +45,10 @@ def refine(foundation_path, args):
 
     exp_dir = os.path.basename(os.path.dirname(os.path.dirname(foundation_path)))
 
-    out_dir = os.path.join(args.artifact_dir, 'refined_preds', exp_dir, aoi)
+    if args.val:
+        out_dir = os.path.join(args.artifact_dir, '_val/refined_preds', exp_dir, aoi)
+    else:
+        out_dir = os.path.join(args.artifact_dir, 'refined_preds', exp_dir, aoi)
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, fn)
 
@@ -53,6 +57,7 @@ def refine(foundation_path, args):
 
 def main():
     args = parse_args()
+    print(f'road mask weight = {args.weight}')
     aois = [d for d in os.listdir(args.foundation) if os.path.isdir(os.path.join(args.foundation, d))]
 
     foundation_paths = []
