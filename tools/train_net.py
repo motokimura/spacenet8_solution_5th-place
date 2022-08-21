@@ -1,6 +1,7 @@
 import argparse
 import os
 import shutil
+import ssl
 
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Trainer, seed_everything
@@ -16,12 +17,14 @@ from spacenet8_model.utils.config import load_config
 from spacenet8_model.utils.wandb import get_wandb_logger
 # isort: on
 
+ssl._create_default_https_context = ssl._create_unverified_context
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--task',
-        choices=['foundation', 'flood'],
+        choices=['foundation', 'flood', 'foundation_xdxd_sn5'],
         required=True
     )
     parser.add_argument(
@@ -39,6 +42,9 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=-1,
         help='exp_id of pretrained siamese branch'
+    )
+    parser.add_argument(
+        '--pretrained_xdxd_sn5'
     )
     parser.add_argument(
         '--config',
@@ -67,6 +73,8 @@ def get_default_cfg_path(task: str) -> str:
         return 'configs/defaults/foundation.yaml'
     elif task == 'flood':
         return 'configs/defaults/flood.yaml'
+    elif task == 'foundation_xdxd_sn5':
+        return 'configs/defaults/foundation_xdxd_sn5.yaml'
     else:
         raise ValueError(task)
 
@@ -137,7 +145,7 @@ def main() -> None:
         limit_val_batches=2 if args.dry else 1.0,
     )
 
-    model = get_model(config, model_dir, pretrained_exp_id=args.pretrained)
+    model = get_model(config, model_dir, pretrained_exp_id=args.pretrained, pretrained_xdxd_sn5_path=args.pretrained_xdxd_sn5)
 
     train_dataloader = get_dataloader(config, is_train=True)
     val_dataloader = get_dataloader(config, is_train=False)

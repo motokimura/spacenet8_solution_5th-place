@@ -1,8 +1,8 @@
 import argparse
 import os
 
+import networkx as nx
 import numpy as np
-import osmnx as nx
 import pandas as pd
 from tqdm import tqdm
 

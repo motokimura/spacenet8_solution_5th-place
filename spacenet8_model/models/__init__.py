@@ -10,15 +10,17 @@ from omegaconf import DictConfig
 from spacenet8_model.models.losses import Loss
 from spacenet8_model.models.seg import SegmentationModel
 from spacenet8_model.models.siamese import SiameseModel
+from spacenet8_model.models.xdxd_sn5.resnet import Resnet50_upsample
+from spacenet8_model.models.xdxd_sn5.senet import SeResnext50_32x4d_upsample
 from spacenet8_model.utils.misc import get_flatten_classes
 # isort: on
 
 
-def get_model(config: DictConfig, model_dir: str, pretrained_exp_id: int = -1) -> torch.nn.Module:
+def get_model(config: DictConfig, model_dir: str, pretrained_exp_id: int = -1, pretrained_xdxd_sn5_path: str = None) -> torch.nn.Module:
     kwargs = {
         # TODO: map config parameters to kwargs based on the architecture
     }
-    model = Model(config, **kwargs)
+    model = Model(config, pretrained_xdxd_sn5_path, **kwargs)
 
     if pretrained_exp_id >= 0:
         model = load_pretrained_siamese_branch(model, config, model_dir, pretrained_exp_id)
@@ -27,23 +29,47 @@ def get_model(config: DictConfig, model_dir: str, pretrained_exp_id: int = -1) -
 
 
 class Model(pl.LightningModule):
-    def __init__(self, config, **kwargs):
+    def __init__(self, config, pretrained_xdxd_sn5_path, **kwargs):
         assert config.Model.n_input_post_images in [0, 1, 2], config.Model.n_input_post_images
-        assert config.Model.type in ['seg', 'siamese'], config.Model.type
+        assert config.Model.type in ['seg', 'siamese', 'xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a'], config.Model.type
 
         super().__init__()
 
         if config.Model.type == 'seg':
             self.model = SegmentationModel(config, **kwargs)
+
         elif config.Model.type == 'siamese':
             self.model = SiameseModel(config, **kwargs)
 
+        elif config.Model.type == 'xdxd_sn5_serx50_focal':
+            self.model = SeResnext50_32x4d_upsample(num_channels=3, num_classes=8)
+            if pretrained_xdxd_sn5_path is not None:
+                print(f'loading {pretrained_xdxd_sn5_path}')
+                state_dict = torch.load(pretrained_xdxd_sn5_path, map_location='cpu')
+                self.model.load_state_dict(state_dict)
+            self.model = remove_xdxd_sn5_redundant_out_channels(self.model)
+
+        elif config.Model.type == 'xdxd_sn5_r50a':
+            self.model = Resnet50_upsample(num_channels=3, num_classes=8)
+            if pretrained_xdxd_sn5_path is not None:
+                print(f'loading {pretrained_xdxd_sn5_path}')
+                state_dict = torch.load(pretrained_xdxd_sn5_path, map_location='cpu')
+                self.model.load_state_dict(state_dict)
+            self.model = remove_xdxd_sn5_redundant_out_channels(self.model)
+
         # model parameters to preprocess input image
-        params = smp.encoders.get_preprocessing_params(config.Model.encoder)
-        self.register_buffer('std',
-                             torch.tensor(params['std']).view(1, 3, 1, 1))
-        self.register_buffer('mean',
-                             torch.tensor(params['mean']).view(1, 3, 1, 1))
+        if config.Model.type in ['seg', 'siamese']:
+            params = smp.encoders.get_preprocessing_params(config.Model.encoder)
+            self.register_buffer('std',
+                                torch.tensor(params['std']).view(1, 3, 1, 1))
+            self.register_buffer('mean',
+                                torch.tensor(params['mean']).view(1, 3, 1, 1))
+
+        elif config.Model.type in ['xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a']:
+            self.register_buffer('std',
+                                torch.tensor([255., 255., 255.]).view(1, 3, 1, 1))
+            self.register_buffer('mean',
+                                torch.tensor([0., 0., 0.]).view(1, 3, 1, 1))
 
         self.loss_fn = Loss(config)
         self.config = config
@@ -73,6 +99,10 @@ class Model(pl.LightningModule):
         elif n_input_post_images == 2:
             image_post_a = (image_post_a - self.mean) / self.std
             image_post_b = (image_post_b - self.mean) / self.std
+
+        if self.config.Model.type in ['xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a']:
+            assert n_input_post_images == 0, n_input_post_images
+            return {'x': image}
 
         if self.config.Model.type == 'seg':
             if n_input_post_images == 1:
@@ -307,5 +337,22 @@ def load_pretrained_siamese_branch(model, config, model_dir, pretrained_exp_id):
     expected_missing_keys.append(f'model.head.{config.Model.n_siamese_head_convs - 1}.weight')
     expected_missing_keys.append(f'model.head.{config.Model.n_siamese_head_convs - 1}.bias')
     assert set(imcompatible_keys.missing_keys) == set(expected_missing_keys), (imcompatible_keys.missing_keys, expected_missing_keys)
+
+    return model
+
+
+def remove_xdxd_sn5_redundant_out_channels(model):
+    final_conv = model.final[-1]
+
+    conv = torch.nn.Conv2d(
+        final_conv.in_channels, 1,
+        kernel_size=3,
+        padding=1,
+        bias=True)
+
+    conv.weight.data = final_conv.weight.data[-1: :, :, :]
+    conv.bias.data = final_conv.bias.data[-1:]
+
+    model.final[-1] = conv
 
     return model

@@ -17,7 +17,7 @@ def parse_args():
     parser.add_argument('--foundation', required=True)
     parser.add_argument('--road_thresh',
                         type=float,
-                        default=0.5)
+                        default=0.3)
     parser.add_argument('--min_spur_length_pix',
                         type=int,
                         default=20)
