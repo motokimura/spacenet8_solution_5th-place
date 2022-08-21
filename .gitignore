@@ -2,6 +2,8 @@
 /wandb
 /notebooks
 *.pth
+localization_densenet_unet_densenet161_3_0_best_dice
+localization_densenet_unet_densenet161_3_1_best_dice
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,visualstudiocode,pycharm,linux,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,jupyternotebooks,visualstudiocode,pycharm,linux,macos
