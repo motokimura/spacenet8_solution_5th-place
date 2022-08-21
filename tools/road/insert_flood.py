@@ -400,6 +400,7 @@ def main():
 
     # workaround to avoid submission error
     df = remove_duplicate_linestring_section(df)
+    df = df.drop_duplicates()
 
     print(df.head(15))
 
