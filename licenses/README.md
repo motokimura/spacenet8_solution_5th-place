@@ -11,7 +11,7 @@ Open Source Resources, Frameworks and Libraries used by this solution.
     Apache 2.0 License
 
 -   xView2 pre-trained unet (w/ densenet161 backbone) by selimsef (2nd place of xView2 challenge)
-    [https://github.com/selimsef/xview2_solution][https://github.com/selimsef/xview2_solution],
+    [https://github.com/selimsef/xview2_solution](https://github.com/selimsef/xview2_solution),
     Apache 2.0 License
 
 The last 2 models are downloaded during docker build (see Dockerfile for the download link).
