@@ -16,11 +16,11 @@ Data:
   ]
   use_mosaic_for_train: True
 Dataloader:
-  train_batch_size: 6  # 10
+  train_batch_size: 10
   train_num_workers: 6
-  val_batch_size: 4  # 4
+  val_batch_size: 4
   val_num_workers: 6
-  test_batch_size: 4  # 4
+  test_batch_size: 4
   test_num_workers: 6
 Transform:
   train_random_crop_size: [512, 512]
