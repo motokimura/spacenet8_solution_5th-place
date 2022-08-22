@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from osgeo import gdal, ogr, osr
 from shapely.wkt import dumps, loads
+from skimage.morphology import dilation, square
 from tqdm import tqdm
 
 
@@ -16,7 +17,8 @@ def parse_args():
     parser.add_argument('--graph', required=True)
     parser.add_argument('--flood', required=True)
     parser.add_argument('--flood_thresh', type=float, default=0.6)
-    parser.add_argument('--flood_area_ratio', type=float, default=0.5)
+    parser.add_argument('--flood_area_ratio', type=float, default=0.3)
+    parser.add_argument('--flood_dilation_ks', type=int, default=5)
     parser.add_argument('--artifact_dir', default='/wdata')
     parser.add_argument('--val', action='store_true')
     return parser.parse_args()
@@ -233,7 +235,7 @@ def pkl_dir_to_wkt(pkl_dir,
     return df
 
 
-def insert_flood_pred(flood_pred_dir, df, road_flood_channel, flood_thresh, flood_area_ratio):
+def insert_flood_pred(flood_pred_dir, df, road_flood_channel, flood_thresh, flood_area_ratio, flood_dilation_ks):
     flood_road_label = 4  # same as sn-8 baseline (any positive int should be okay)
 
     dy=2
@@ -254,6 +256,8 @@ def insert_flood_pred(flood_pred_dir, df, road_flood_channel, flood_thresh, floo
         flood_mask = ds.ReadAsArray()[road_flood_channel].astype(float) / 255.0
         flood_arr = np.zeros(shape=flood_mask.shape, dtype=np.uint8)
         flood_arr[flood_mask >= flood_thresh] = flood_road_label  # 4: flooded road, 0: others
+        if flood_dilation_ks > 0:
+            flood_arr = dilation(flood_arr, square(flood_dilation_ks))  # dilate to cope with alignment error b/w pre and post images
 
         if row["WKT_Pix"] != "LINESTRING EMPTY":
             geom = ogr.CreateGeometryFromWkt(row["WKT_Pix"])        
@@ -309,7 +313,8 @@ def process_aoi(args, aoi):
         df,
         road_flood_channel,
         args.flood_thresh,
-        args.flood_area_ratio
+        args.flood_area_ratio,
+        args.flood_dilation_ks
     )
     
     return df
