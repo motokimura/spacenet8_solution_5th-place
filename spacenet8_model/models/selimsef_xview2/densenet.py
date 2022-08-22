@@ -22,7 +22,8 @@ model_urls = {
 }
 
 
-def densenet121(pretrained=True, **kwargs):
+# motokimura replaced pretrained=True with pretrained=False
+def densenet121(pretrained=False, **kwargs):
     r"""Densenet-121 model from
     `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
 
@@ -52,7 +53,8 @@ def densenet121(pretrained=True, **kwargs):
     return model
 
 
-def densenet169(pretrained=True, **kwargs):
+# motokimura replaced pretrained=True with pretrained=False
+def densenet169(pretrained=False, **kwargs):
     r"""Densenet-169 model from
     `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
 
@@ -82,7 +84,8 @@ def densenet169(pretrained=True, **kwargs):
     return model
 
 
-def densenet201(pretrained=True, **kwargs):
+# motokimura replaced pretrained=True with pretrained=False
+def densenet201(pretrained=False, **kwargs):
     r"""Densenet-201 model from
     `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
 
@@ -109,7 +112,8 @@ def densenet201(pretrained=True, **kwargs):
     return model
 
 
-def densenet161(pretrained=True, **kwargs):
+# motokimura replaced pretrained=True with pretrained=False
+def densenet161(pretrained=False, **kwargs):
     r"""Densenet-161 model from
     `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
 

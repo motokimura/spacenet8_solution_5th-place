@@ -383,7 +383,8 @@ def initialize_pretrained_model(model, num_classes, settings):
     assert num_classes == settings['num_classes'], \
         'num_classes should be {}, but is {}'.format(
             settings['num_classes'], num_classes)
-    model.load_state_dict(model_zoo.load_url(settings['url']))
+    # motokimura commented out the line(s) below: do not use ImageNet pre-trained model
+    #model.load_state_dict(model_zoo.load_url(settings['url']))
     model.input_space = settings['input_space']
     model.input_size = settings['input_size']
     model.input_range = settings['input_range']
@@ -530,10 +531,12 @@ class AbstractModel(nn.Module):
                 m.bias.data.zero_()
 
     def initialize_encoder(self, model, model_url):
-        pretrained_dict = model_zoo.load_url(model_url)
-        model_dict = model.state_dict()
-        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
-        model.load_state_dict(pretrained_dict)
+        # motokimura commented out the line(s) below: do not use ImageNet pre-trained model
+        pass
+        #pretrained_dict = model_zoo.load_url(model_url)
+        #model_dict = model.state_dict()
+        #pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+        #model.load_state_dict(pretrained_dict)
 
 def _get_layers_params(layers):
     return sum((list(l.parameters()) for l in layers), [])

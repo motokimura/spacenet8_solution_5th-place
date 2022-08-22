@@ -270,7 +270,7 @@ class EncoderDecoder(AbstractModel):
             #                                         self.last_upsample_filters)
             # TODO: make it configurable
             #self.last_upsample = UpsamplingBilinear2d(scale_factor=2)
-            self.last_upsample = Upsample(scale_factor=2)
+            self.last_upsample = Upsample(scale_factor=2)  # motokimura replaced UpsamplingBilinear2d with Upsample to use deterministic algorithm
         if self.use_bilinear_4x:
             self.final = self.make_final_classifier(self.decoder_filters[1], num_classes)
         else:
