@@ -269,10 +269,12 @@ class AbstractModel(nn.Module):
                 m.bias.data.zero_()
 
     def initialize_encoder(self, model, model_url):
-        pretrained_dict = model_zoo.load_url(model_url)
-        model_dict = model.state_dict()
-        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
-        model.load_state_dict(pretrained_dict)
+        # motokimura commented out the line(s) below: do not use ImageNet pre-trained model
+        pass
+        #pretrained_dict = model_zoo.load_url(model_url)
+        #model_dict = model.state_dict()
+        #pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+        #model.load_state_dict(pretrained_dict)
 
 def _get_layers_params(layers):
     return sum((list(l.parameters()) for l in layers), [])
