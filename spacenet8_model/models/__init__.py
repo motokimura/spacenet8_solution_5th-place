@@ -12,6 +12,7 @@ from spacenet8_model.models.seg import SegmentationModel
 from spacenet8_model.models.siamese import SiameseModel
 from spacenet8_model.models.xdxd_sn5.resnet import Resnet50_upsample
 from spacenet8_model.models.xdxd_sn5.senet import SeResnext50_32x4d_upsample
+from spacenet8_model.models.cannab_sn5.models import Dpn92_9ch_Unet
 from spacenet8_model.models.selimsef_xview2.unet import DensenetUnet
 from spacenet8_model.utils.misc import get_flatten_classes
 # isort: on
@@ -32,7 +33,7 @@ def get_model(config: DictConfig, model_dir: str, pretrained_exp_id: int = -1, p
 class Model(pl.LightningModule):
     def __init__(self, config, pretrained_path, **kwargs):
         assert config.Model.n_input_post_images in [0, 1, 2], config.Model.n_input_post_images
-        assert config.Model.type in ['seg', 'siamese', 'xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a', 'selimsef_xview2_densenet161_3'], config.Model.type
+        assert config.Model.type in ['seg', 'siamese', 'xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a', 'cannab_sn5_dpn92', 'selimsef_xview2_densenet161_3'], config.Model.type
 
         super().__init__()
 
@@ -58,6 +59,15 @@ class Model(pl.LightningModule):
                 self.model.load_state_dict(state_dict)
             self.model = remove_xdxd_sn5_redundant_out_channels(self.model)
 
+        elif config.Model.type == 'cannab_sn5_dpn92':
+            self.model = Dpn92_9ch_Unet(pretrained=False)
+            self.model = torch.nn.DataParallel(self.model)
+            if pretrained_path is not None:
+                print(f'loading {pretrained_path}')
+                state_dict = torch.load(pretrained_path, map_location='cpu')
+                self.model.load_state_dict(state_dict['state_dict'])
+            self.model = remove_cannab_sn5_redundant_channels(self.model)
+
         elif config.Model.type == 'selimsef_xview2_densenet161_3':
             self.model = DensenetUnet(1, 'densenet161_3')
             self.model = torch.nn.DataParallel(self.model)
@@ -79,6 +89,12 @@ class Model(pl.LightningModule):
                                 torch.tensor([255., 255., 255.]).view(1, 3, 1, 1))
             self.register_buffer('mean',
                                 torch.tensor([0., 0., 0.]).view(1, 3, 1, 1))
+        
+        elif config.Model.type in ['cannab_sn5_dpn92']:
+            self.register_buffer('std',
+                                torch.tensor([127., 127., 127.]).view(1, 3, 1, 1))
+            self.register_buffer('mean',
+                                torch.tensor([127., 127., 127.]).view(1, 3, 1, 1))
 
         elif config.Model.type in ['selimsef_xview2_densenet161_3']:
             self.register_buffer('std',
@@ -115,7 +131,7 @@ class Model(pl.LightningModule):
             image_post_a = (image_post_a - self.mean) / self.std
             image_post_b = (image_post_b - self.mean) / self.std
 
-        if self.config.Model.type in ['xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a', 'selimsef_xview2_densenet161_3']:
+        if self.config.Model.type in ['xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a', 'selimsef_xview2_densenet161_3', 'cannab_sn5_dpn92']:
             assert n_input_post_images == 0, n_input_post_images
             return {'x': image}
 
@@ -369,5 +385,21 @@ def remove_xdxd_sn5_redundant_out_channels(model):
     conv.bias.data = final_conv.bias.data[-1:]
 
     model.final[-1] = conv
+
+    return model
+
+
+def remove_cannab_sn5_redundant_channels(model):
+    # XXX: assuming Dpn92_9ch_Unet model
+    in_conv = model.module.conv1[0]
+    new_in_conv = torch.nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)  # same as in_conv
+    new_in_conv.weight.data = torch.flip(in_conv.weight.data[:, :3, :, :], dims=[1])  # drop channel >=3 and flip bgr to rgb
+    model.module.conv1[0] = new_in_conv
+
+    out_conv = model.module.res
+    new_out_conv = torch.nn.Conv2d(64, 1, kernel_size=1, stride=1, bias=True)  # same as out_conv
+    new_out_conv.weight.data = out_conv.weight.data[:1, :, :, :]
+    new_out_conv.bias.data = out_conv.bias.data[:1]
+    model.module.res = new_out_conv
 
     return model
