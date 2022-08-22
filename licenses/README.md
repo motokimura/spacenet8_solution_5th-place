@@ -29,7 +29,7 @@ Please see `prepare_sn5_XD_XD_models.md` to know how I prepared this model.
     [https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch), 
     [NVIDIA DEEP LEARNING CONTAINER LICENSE](https://developer.download.nvidia.com/licenses/NVIDIA_Deep_Learning_Container_License.pdf?8-4yoqobo3sABIk5HIXNCgHbxf9BoyjA67FpiMeufj88VoUNCKPK29cHYJYxyB1bMD5IL0KosS5LsOZ1NJHnRXe_KAUUScf0d7BZIyE8PfDUV__-vMLKGWpSkd536BFWbrK6EYsrXhLrrfAOZfvmGhI4&t=eyJscyI6ImdzZW8iLCJsc2QiOiJodHRwczpcL1wvd3d3Lmdvb2dsZS5jb21cLyJ9)
 
-## CNN model training and inference:
+## CNN model modeling, training, and inference:
 
 -   PyTorch,
     [https://pytorch.org/](https://pytorch.org/),
@@ -38,6 +38,14 @@ Please see `prepare_sn5_XD_XD_models.md` to know how I prepared this model.
 -   segmentation_models.pytorch,
     [https://github.com/qubvel/segmentation_models.pytorch](https://github.com/qubvel/segmentation_models.pytorch),
     MIT License
+
+-   SpaceNet-5 1st place solution by XD_XD,
+    [https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd),
+    Apache 2.0 License
+
+-   xView2 2nd place solution by selimsef,
+    [https://github.com/selimsef/xview2_solution](https://github.com/selimsef/xview2_solution),
+    Apache 2.0 License
 
 -   PyTorch Image Models,
     [https://github.com/rwightman/pytorch-image-models](https://github.com/rwightman/pytorch-image-models),
