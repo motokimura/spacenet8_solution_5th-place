@@ -1,10 +1,15 @@
 """
+from cannab's 2nd place solution for SpaceNet-5 challenge
+https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/blob/master/cannab/zoo/senet.py
+"""
+
+"""
 ResNet code gently borrowed from
 https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 """
 
-from collections import OrderedDict
 import math
+from collections import OrderedDict
 
 import torch
 import torch.nn as nn

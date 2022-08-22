@@ -1,13 +1,18 @@
-import numpy as np
+"""
+from selimsef's 2nd place solution for xView2 challenge
+https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/blob/master/cannab/zoo/models.py
+"""
 
+import numpy as np
 import torch
-from torch import nn
 import torch.nn.functional as F
 import torchvision.models
+from torch import nn
 
 from.resnet_in import resnet34_in
-from .senet import se_resnext50_32x4d, senet154, se_resnext101_32x4d
 from .dpn import dpn92
+from .senet import se_resnext50_32x4d, se_resnext101_32x4d, senet154
+
 
 class ConvReluBN(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size=3):

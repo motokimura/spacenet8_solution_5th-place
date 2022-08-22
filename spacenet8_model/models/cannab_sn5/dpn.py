@@ -1,3 +1,8 @@
+"""
+from cannab's 2nd place solution for SpaceNet-5 challenge
+https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/blob/master/cannab/zoo/dpn.py
+"""
+
 """ PyTorch implementation of DualPathNetworks
 Ported to PyTorch by [Ross Wightman](https://github.com/rwightman/pytorch-dpn-pretrained)
 
@@ -8,11 +13,12 @@ This implementation is compatible with the pretrained weights
 from cypw's MXNet implementation.
 """
 import os
+from collections import OrderedDict
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
-from collections import OrderedDict
 
 __all__ = ['DPN', 'dpn68', 'dpn68b', 'dpn92', 'dpn98', 'dpn131', 'dpn107']
 
