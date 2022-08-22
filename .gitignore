@@ -1,6 +1,6 @@
 /.env
 /wandb
-/notebooks
+/notebooks*
 *.pth
 localization_densenet_unet_densenet161_3_0_best_dice
 localization_densenet_unet_densenet161_3_1_best_dice

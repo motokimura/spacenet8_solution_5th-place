@@ -14,6 +14,7 @@ from spacenet8_model.models.xdxd_sn5.resnet import Resnet50_upsample
 from spacenet8_model.models.xdxd_sn5.senet import SeResnext50_32x4d_upsample
 from spacenet8_model.models.cannab_sn5.models import Dpn92_9ch_Unet
 from spacenet8_model.models.selimsef_xview2.unet import DensenetUnet
+from spacenet8_model.models.selimsef_sn4.unet import DensenetUnet as SN4DenseUnet
 from spacenet8_model.utils.misc import get_flatten_classes
 # isort: on
 
@@ -33,7 +34,7 @@ def get_model(config: DictConfig, model_dir: str, pretrained_exp_id: int = -1, p
 class Model(pl.LightningModule):
     def __init__(self, config, pretrained_path, **kwargs):
         assert config.Model.n_input_post_images in [0, 1, 2], config.Model.n_input_post_images
-        assert config.Model.type in ['seg', 'siamese', 'xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a', 'cannab_sn5_dpn92', 'selimsef_xview2_densenet161_3'], config.Model.type
+        assert config.Model.type in ['seg', 'siamese', 'xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a', 'cannab_sn5_dpn92', 'selimsef_xview2_densenet161_3', 'selimsef_sn4_densenet161'], config.Model.type
 
         super().__init__()
 
@@ -76,6 +77,14 @@ class Model(pl.LightningModule):
                 state_dict = torch.load(pretrained_path, map_location='cpu')
                 self.model.load_state_dict(state_dict['state_dict'])
 
+        elif config.Model.type == 'selimsef_sn4_densenet161':
+            self.model = SN4DenseUnet(3, 'densenet161')
+            if pretrained_path is not None:
+                print(f'loading {pretrained_path}')
+                state_dict = torch.load(pretrained_path, map_location='cpu')
+                self.model.load_state_dict(state_dict)
+            self.model = remove_selimsef_sn4_redundant_in_channels(self.model)
+
         # model parameters to preprocess input image
         if config.Model.type in ['seg', 'siamese']:
             params = smp.encoders.get_preprocessing_params(config.Model.encoder)
@@ -96,7 +105,7 @@ class Model(pl.LightningModule):
             self.register_buffer('mean',
                                 torch.tensor([127., 127., 127.]).view(1, 3, 1, 1))
 
-        elif config.Model.type in ['selimsef_xview2_densenet161_3']:
+        elif config.Model.type in ['selimsef_xview2_densenet161_3', 'selimsef_sn4_densenet161']:
             self.register_buffer('std',
                                 torch.tensor([0.229 * 255., 0.224 * 255., 0.225 * 255.]).view(1, 3, 1, 1))
             self.register_buffer('mean',
@@ -131,7 +140,7 @@ class Model(pl.LightningModule):
             image_post_a = (image_post_a - self.mean) / self.std
             image_post_b = (image_post_b - self.mean) / self.std
 
-        if self.config.Model.type in ['xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a', 'selimsef_xview2_densenet161_3', 'cannab_sn5_dpn92']:
+        if self.config.Model.type in ['xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a', 'selimsef_xview2_densenet161_3', 'cannab_sn5_dpn92', 'selimsef_sn4_densenet161']:
             assert n_input_post_images == 0, n_input_post_images
             return {'x': image}
 
@@ -401,5 +410,21 @@ def remove_cannab_sn5_redundant_channels(model):
     new_out_conv.weight.data = out_conv.weight.data[:1, :, :, :]
     new_out_conv.bias.data = out_conv.bias.data[:1]
     model.module.res = new_out_conv
+
+    return model
+
+
+def remove_selimsef_sn4_redundant_in_channels(model):
+    # XXX: assuming densenet161 model
+    in_conv = model.encoder_stages[0][0]
+    new_in_conv = torch.nn.Conv2d(3, 96, kernel_size=7, stride=2, padding=3, bias=False)  # same as in_conv
+    new_in_conv.weight.data = torch.flip(in_conv.weight.data[:, :3, :, :], dims=[1])  # drop channel >=3
+    model.encoder_stages[0][0] = new_in_conv
+
+    out_conv = model.final[0]
+    new_out_conv = torch.nn.Conv2d(64, 1, kernel_size=1, stride=1, bias=True)  # same as out_conv
+    new_out_conv.weight.data = out_conv.weight.data[:1, :, :, :]
+    new_out_conv.bias.data = out_conv.bias.data[:1]
+    model.final[0] = new_out_conv
 
     return model

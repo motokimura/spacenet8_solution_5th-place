@@ -24,7 +24,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--task',
-        choices=['foundation', 'flood', 'foundation_xdxd_sn5', 'foundation_cannab_sn5', 'foundation_selimsef_xview2'],
+        choices=['foundation', 'flood', 'foundation_xdxd_sn5', 'foundation_cannab_sn5', 'foundation_selimsef_xview2', 'foundation_selimsef_sn4'],
         required=True
     )
     parser.add_argument(
@@ -79,6 +79,8 @@ def get_default_cfg_path(task: str) -> str:
         return 'configs/defaults/foundation_cannab_sn5.yaml'
     elif task == 'foundation_selimsef_xview2':
         return 'configs/defaults/foundation_selimsef_xview2.yaml'
+    elif task == 'foundation_selimsef_sn4':
+        return 'configs/defaults/foundation_selimsef_sn4.yaml'
     else:
         raise ValueError(task)
 
