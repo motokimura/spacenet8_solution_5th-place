@@ -24,7 +24,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--task',
-        choices=['foundation', 'flood', 'foundation_xdxd_sn5'],
+        choices=['foundation', 'flood', 'foundation_xdxd_sn5', 'foundation_selimsef_xview2'],
         required=True
     )
     parser.add_argument(
@@ -44,7 +44,7 @@ def parse_args() -> argparse.Namespace:
         help='exp_id of pretrained siamese branch'
     )
     parser.add_argument(
-        '--pretrained_xdxd_sn5'
+        '--pretrained_path'
     )
     parser.add_argument(
         '--config',
@@ -75,6 +75,8 @@ def get_default_cfg_path(task: str) -> str:
         return 'configs/defaults/flood.yaml'
     elif task == 'foundation_xdxd_sn5':
         return 'configs/defaults/foundation_xdxd_sn5.yaml'
+    elif task == 'foundation_selimsef_xview2':
+        return 'configs/defaults/foundation_selimsef_xview2.yaml'
     else:
         raise ValueError(task)
 
@@ -145,7 +147,7 @@ def main() -> None:
         limit_val_batches=2 if args.dry else 1.0,
     )
 
-    model = get_model(config, model_dir, pretrained_exp_id=args.pretrained, pretrained_xdxd_sn5_path=args.pretrained_xdxd_sn5)
+    model = get_model(config, model_dir, pretrained_exp_id=args.pretrained, pretrained_path=args.pretrained_path)
 
     train_dataloader = get_dataloader(config, is_train=True)
     val_dataloader = get_dataloader(config, is_train=False)

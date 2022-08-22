@@ -1,6 +1,25 @@
 Open Source Resources, Frameworks and Libraries used by this solution.
 
-### Environment setup:
+## Pre-trained models:
+
+-   pytorch-image-models (timm) ImageNet pre-trained efficientnet-b5 and efficientnet-b6,
+    [https://github.com/rwightman/pytorch-image-models](https://github.com/rwightman/pytorch-image-models),
+    Apache 2.0 License
+
+-   SpaceNet-5 pre-trained unet (w/ SEResNeXt-50 backbone) by XD_XD (winner of SpaceNet-5 challenge)
+    [https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd),
+    Apache 2.0 License
+
+-   xView2 pre-trained unet (w/ densenet161 backbone) by selimsef (2nd place of xView2 challenge)
+    [https://github.com/selimsef/xview2_solution](https://github.com/selimsef/xview2_solution),
+    Apache 2.0 License
+
+The last 2 models are downloaded during docker build (see Dockerfile for the download link).
+
+SpaceNet-5 pre-trained unet is uploaded to my own AWS S3 (`https://motokimura-public-sn8.s3.amazonaws.com/xdxd_sn5_serx50_focal.zip`).
+Please see `prepare_sn5_XD_XD_models.md` to know how I prepared this model.
+
+## Environment setup:
 
 -   NVIDIA Docker,
     [https://github.com/NVIDIA/nvidia-docker](https://github.com/NVIDIA/nvidia-docker),
@@ -10,7 +29,7 @@ Open Source Resources, Frameworks and Libraries used by this solution.
     [https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch), 
     [NVIDIA DEEP LEARNING CONTAINER LICENSE](https://developer.download.nvidia.com/licenses/NVIDIA_Deep_Learning_Container_License.pdf?8-4yoqobo3sABIk5HIXNCgHbxf9BoyjA67FpiMeufj88VoUNCKPK29cHYJYxyB1bMD5IL0KosS5LsOZ1NJHnRXe_KAUUScf0d7BZIyE8PfDUV__-vMLKGWpSkd536BFWbrK6EYsrXhLrrfAOZfvmGhI4&t=eyJscyI6ImdzZW8iLCJsc2QiOiJodHRwczpcL1wvd3d3Lmdvb2dsZS5jb21cLyJ9)
 
-### CNN model training and inference:
+## CNN model training and inference:
 
 -   PyTorch,
     [https://pytorch.org/](https://pytorch.org/),
@@ -28,7 +47,7 @@ Open Source Resources, Frameworks and Libraries used by this solution.
     [https://github.com/Lightning-AI/lightning](https://github.com/Lightning-AI/lightning),
     Apache 2.0 License
 
-### Pre-processing for SN8 dataset:
+## Pre-processing for SN8 dataset:
 
 -   Albumentations,
     [https://github.com/albumentations-team/albumentations](https://github.com/albumentations-team/albumentations),
@@ -54,7 +73,7 @@ Open Source Resources, Frameworks and Libraries used by this solution.
     [https://github.com/Toblerity/Shapely](https://github.com/Toblerity/Shapely),
     BSD 3-Clause License
 
-### Post-processing for CNN output:
+## Post-processing for CNN output:
 
 -   utm,
     [https://github.com/Turbo87/utm](https://github.com/Turbo87/utm),
@@ -72,7 +91,7 @@ Open Source Resources, Frameworks and Libraries used by this solution.
     [https://github.com/geopandas/geopandas](https://github.com/geopandas/geopandas),
     BSD 3-Clause License
 
-### CNN model development (experiment management):
+## CNN model development (experiment management):
 
 -   OmegaConf,
     [https://github.com/omry/omegaconf](https://github.com/omry/omegaconf),
@@ -102,7 +121,7 @@ Open Source Resources, Frameworks and Libraries used by this solution.
     [https://github.com/theskumar/python-dotenv](https://github.com/theskumar/python-dotenv),
     BSD 3-Clause License
 
-### Others:
+## Others:
 
 -   NumPy,
     [https://numpy.org/](https://numpy.org/),
