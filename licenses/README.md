@@ -10,15 +10,11 @@ Open Source Resources, Frameworks and Libraries used by this solution.
     [https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd),
     Apache 2.0 License
 
--   SpaceNet-5 pre-trained unet (w/ DPN92 backbone) by cannab (2nd place of SpaceNet-5 challenge)
-    [https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/cannab](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/cannab),
-    Apache 2.0 License
-
 -   xView2 pre-trained unet (w/ densenet161 backbone) by selimsef (2nd place of xView2 challenge)
     [https://github.com/selimsef/xview2_solution](https://github.com/selimsef/xview2_solution),
     Apache 2.0 License
 
-The last 3 models are downloaded during docker build (see Dockerfile for the download link).
+The models other than timm models are downloaded during docker build (see Dockerfile for the download link).
 
 SpaceNet-5 pre-trained unet is uploaded to my own AWS S3 (`https://motokimura-public-sn8.s3.amazonaws.com/xdxd_sn5_serx50_focal.zip`).
 Please see `prepare_sn5_XD_XD_models.md` to know how I prepared this model.
@@ -43,8 +39,12 @@ Please see `prepare_sn5_XD_XD_models.md` to know how I prepared this model.
     [https://github.com/qubvel/segmentation_models.pytorch](https://github.com/qubvel/segmentation_models.pytorch),
     MIT License
 
--   SpaceNet-5 challenge 1st place solution by XD_XD,
-    [https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd),
+-   SpaceNet-5 challenge,
+    [https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions),
+    Apache 2.0 License
+
+-   SpaceNet-4 challenge,
+    [https://github.com/SpaceNetChallenge/SpaceNet_Off_Nadir_Solutions](https://github.com/SpaceNetChallenge/SpaceNet_Off_Nadir_Solutions),
     Apache 2.0 License
 
 -   xView2 2nd place solution by selimsef,
