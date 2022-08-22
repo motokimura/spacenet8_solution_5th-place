@@ -46,9 +46,9 @@ Data:
 Dataloader:
   train_batch_size: 10
   train_num_workers: 6
-  val_batch_size: 8
+  val_batch_size: 4
   val_num_workers: 6
-  test_batch_size: 8
+  test_batch_size: 4
   test_num_workers: 6
 Transform:
   train_random_crop_size: [352, 352]
