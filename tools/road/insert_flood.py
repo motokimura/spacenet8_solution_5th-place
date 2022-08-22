@@ -16,7 +16,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--graph', required=True)
     parser.add_argument('--flood', required=True)
-    parser.add_argument('--flood_thresh', type=float, default=0.6)
+    parser.add_argument('--flood_thresh', type=float, default=0.3)
     parser.add_argument('--flood_area_ratio', type=float, default=0.3)
     parser.add_argument('--flood_dilation_ks', type=int, default=5)
     parser.add_argument('--artifact_dir', default='/wdata')
