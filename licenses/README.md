@@ -39,7 +39,7 @@ Please see `prepare_sn5_XD_XD_models.md` to know how I prepared this model.
     [https://github.com/qubvel/segmentation_models.pytorch](https://github.com/qubvel/segmentation_models.pytorch),
     MIT License
 
--   SpaceNet-5 1st place solution by XD_XD,
+-   SpaceNet-5 challenge 1st place solution by XD_XD,
     [https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd),
     Apache 2.0 License
 
