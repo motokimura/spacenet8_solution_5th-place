@@ -70,6 +70,18 @@ RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_60421.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_60422.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_60423.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_60424.zip
+# se-resnext50 foundation (road only)
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80000.zip
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80001.zip
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80002.zip
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80003.zip
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80004.zip
+# densenet161 foundation (building only)
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_85000.zip
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_85001.zip
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_85002.zip
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_85003.zip
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_85004.zip
 RUN unzip "*.zip" && rm -f *.zip
 
 ENV PYTHONPATH $PYTHONPATH:/work
