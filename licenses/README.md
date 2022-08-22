@@ -1,5 +1,24 @@
 Open Source Resources, Frameworks and Libraries used by this solution.
 
+## Pre-trained models:
+
+-   pytorch-image-models (timm) ImageNet pre-trained efficientnet-b5 and efficientnet-b6,
+    [https://github.com/rwightman/pytorch-image-models](https://github.com/rwightman/pytorch-image-models),
+    Apache 2.0 License
+
+-   SpaceNet-5 pre-trained unet (w/ SEResNeXt-50 backbone) by XD_XD (winner of SpaceNet-5 challenge)
+    [https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd),
+    Apache 2.0 License
+
+-   xView2 pre-trained unet (w/ densenet161 backbone) by selimsef (2nd place of xView2 challenge)
+    [https://github.com/selimsef/xview2_solution][https://github.com/selimsef/xview2_solution],
+    Apache 2.0 License
+
+The last 2 models are downloaded during docker build (see Dockerfile for the download link).
+
+SpaceNet-5 pre-trained unet is uploaded to my own AWS S3 (`https://motokimura-public-sn8.s3.amazonaws.com/xdxd_sn5_serx50_focal.zip`).
+Please see `prepare_sn5_XD_XD_models.md` to know how I prepared this model.
+
 ### Environment setup:
 
 -   NVIDIA Docker,
