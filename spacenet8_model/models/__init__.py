@@ -13,6 +13,7 @@ from spacenet8_model.models.siamese import SiameseModel
 from spacenet8_model.models.xdxd_sn5.resnet import Resnet50_upsample
 from spacenet8_model.models.xdxd_sn5.senet import SeResnext50_32x4d_upsample
 from spacenet8_model.models.selimsef_xview2.unet import DensenetUnet
+from spacenet8_model.models.selimsef_xview2.siamese_unet import DensenetUnet as SiameseDenseNetUnet
 from spacenet8_model.utils.misc import get_flatten_classes
 # isort: on
 
@@ -32,7 +33,7 @@ def get_model(config: DictConfig, model_dir: str, pretrained_exp_id: int = -1, p
 class Model(pl.LightningModule):
     def __init__(self, config, pretrained_path, **kwargs):
         assert config.Model.n_input_post_images in [0, 1, 2], config.Model.n_input_post_images
-        assert config.Model.type in ['seg', 'siamese', 'xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a', 'selimsef_xview2_densenet161_3'], config.Model.type
+        assert config.Model.type in ['seg', 'siamese', 'xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a', 'selimsef_xview2_densenet161_3', 'selimsef_xview2_siamese_densenet161'], config.Model.type
 
         super().__init__()
 
@@ -65,6 +66,15 @@ class Model(pl.LightningModule):
                 print(f'loading {pretrained_path}')
                 state_dict = torch.load(pretrained_path, map_location='cpu')
                 self.model.load_state_dict(state_dict['state_dict'])
+        
+        elif config.Model.type == 'selimsef_xview2_siamese_densenet161':
+            self.model = SiameseDenseNetUnet(5, 'densenet161', shared=True)
+            self.model = torch.nn.DataParallel(self.model)
+            if pretrained_path is not None:
+                print(f'loading {pretrained_path}')
+                state_dict = torch.load(pretrained_path, map_location='cpu')
+                self.model.load_state_dict(state_dict['state_dict'])
+            self.model = remove_selimsef_xview2_siamese_redundant_out_channels(self.model)
 
         # model parameters to preprocess input image
         if config.Model.type in ['seg', 'siamese']:
@@ -80,7 +90,7 @@ class Model(pl.LightningModule):
             self.register_buffer('mean',
                                 torch.tensor([0., 0., 0.]).view(1, 3, 1, 1))
 
-        elif config.Model.type in ['selimsef_xview2_densenet161_3']:
+        elif config.Model.type in ['selimsef_xview2_densenet161_3', 'selimsef_xview2_siamese_densenet161']:
             self.register_buffer('std',
                                 torch.tensor([0.229 * 255., 0.224 * 255., 0.225 * 255.]).view(1, 3, 1, 1))
             self.register_buffer('mean',
@@ -118,6 +128,11 @@ class Model(pl.LightningModule):
         if self.config.Model.type in ['xdxd_sn5_serx50_focal', 'xdxd_sn5_r50a', 'selimsef_xview2_densenet161_3']:
             assert n_input_post_images == 0, n_input_post_images
             return {'x': image}
+
+        if self.config.Model.type == 'selimsef_xview2_siamese_densenet161':
+            assert n_input_post_images == 1, n_input_post_images
+            image = torch.cat([image, image_post_a], axis=1)
+            return {'input_x': image}
 
         if self.config.Model.type == 'seg':
             if n_input_post_images == 1:
@@ -369,5 +384,25 @@ def remove_xdxd_sn5_redundant_out_channels(model):
     conv.bias.data = final_conv.bias.data[-1:]
 
     model.final[-1] = conv
+
+    return model
+
+
+def remove_selimsef_xview2_siamese_redundant_out_channels(model):
+    final_conv = model.module.final[-1]
+
+    conv = torch.nn.Conv2d(
+        final_conv.in_channels, 2,
+        kernel_size=1,
+        padding=0,
+        bias=True)
+
+    conv.weight.data[0, :, :, :] = final_conv.weight.data[2:, :, :, :].mean(dim=0)
+    conv.weight.data[1, :, :, :] = final_conv.weight.data[1, :, :, :]
+
+    conv.bias.data[0] = final_conv.bias.data[2:].mean()
+    conv.bias.data[1] = final_conv.bias.data[1]
+
+    model.module.final[-1] = conv
 
     return model

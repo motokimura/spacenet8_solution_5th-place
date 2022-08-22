@@ -37,6 +37,8 @@ RUN chmod a+x /work/*.sh
 WORKDIR /work/selimsef_xview2_models
 RUN wget -nv https://github.com/selimsef/xview2_solution/releases/download/0.0.1/localization_densenet_unet_densenet161_3_0_best_dice
 RUN wget -nv https://github.com/selimsef/xview2_solution/releases/download/0.0.1/localization_densenet_unet_densenet161_3_1_best_dice
+RUN wget -nv https://github.com/selimsef/xview2_solution/releases/download/0.0.1/pseudo_densenet_seamese_unet_shared_densenet161_0_best_xview
+RUN wget -nv https://github.com/selimsef/xview2_solution/releases/download/0.0.1/pseudo_densenet_seamese_unet_shared_densenet161_2_best_xview
 
 # download XD_XD's SpaceNet-5 winning models
 # see prepare_sn5_XD_XD_models.md to know how I prepared these models
