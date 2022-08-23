@@ -5,6 +5,18 @@ START_TIME=$SECONDS
 TEST_DIR=$1
 OUT_PATH=$2
 
+rm -rf /wdata/test.csv
+rm -rf /wdata/warped_posts_test/
+rm -rf /wdata/logs/test/
+rm -rf /wdata/preds/
+rm -rf /wdata/ensembled_preds/
+rm -rf /wdata/refined_preds*/
+rm -rf /wdata/building_submissions/
+rm -rf /wdata/road_vectors/ 
+rm -rf /wdata/road_graphs/
+rm -rf /wdata/road_submissions/
+rm -rf /wdata/submissions
+
 # preprocess
 python tools/make_test_csv.py --test_dir $TEST_DIR
 python tools/warp_post_images.py --root_dir $TEST_DIR --test
