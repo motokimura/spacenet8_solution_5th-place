@@ -4,6 +4,8 @@
 *.pth
 localization_densenet_unet_densenet161_3_0_best_dice
 localization_densenet_unet_densenet161_3_1_best_dice
+pseudo_densenet_seamese_unet_shared_densenet161_0_best_xview
+pseudo_densenet_seamese_unet_shared_densenet161_2_best_xview
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,visualstudiocode,pycharm,linux,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,jupyternotebooks,visualstudiocode,pycharm,linux,macos

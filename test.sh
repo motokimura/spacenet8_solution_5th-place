@@ -30,7 +30,7 @@ FOUNDATION_ARGS=" --override_model_dir /work/models Data.test_dir=$TEST_DIR"
 FLOOD_ARGS=" --use_ema_weight --tta_hflip_channels 0 --override_model_dir /work/models Data.test_dir=$TEST_DIR"
 
 echo ""
-echo "predicting... (1/8)"
+echo "predicting... (1/9)"
 echo "this will take ~6 min"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -57,7 +57,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/test_net.py \
 wait
 
 echo ""
-echo "predicting... (2/8)"
+echo "predicting... (2/9)"
 echo "this will take ~6 min"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -84,7 +84,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/test_net.py \
 wait
 
 echo ""
-echo "predicting... (3/8)"
+echo "predicting... (3/9)"
 echo "this will take ~6 min"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -111,7 +111,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/test_net.py \
 wait
 
 echo ""
-echo "predicting... (4/8)"
+echo "predicting... (4/9)"
 echo "this will take ~6 min"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -138,7 +138,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/test_net.py \
 wait
 
 echo ""
-echo "predicting... (5/8)"
+echo "predicting... (5/9)"
 echo "this will take ~6 min"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -165,7 +165,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/test_net.py \
 wait
 
 echo ""
-echo "predicting... (6/8)"
+echo "predicting... (6/9)"
 echo "this will take ~6 min"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -192,7 +192,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/test_net.py \
 wait
 
 echo ""
-echo "predicting... (7/8)"
+echo "predicting... (7/9)"
 echo "this will take ~6 min"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -219,7 +219,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/test_net.py \
 wait
 
 echo ""
-echo "predicting... (8/8)"
+echo "predicting... (8/9)"
 echo "this will take ~6 min"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -233,6 +233,38 @@ nohup env CUDA_VISIBLE_DEVICES=1 python tools/test_net.py \
     $FOUNDATION_ARGS \
     > $LOG_DIR/exp_80504.txt 2>&1 &
 
+nohup env CUDA_VISIBLE_DEVICES=2 python tools/test_net.py \
+    --exp_id 90010 \
+    $FLOOD_ARGS \
+    > $LOG_DIR/exp_90010.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=3 python tools/test_net.py \
+    --exp_id 90011 \
+    $FLOOD_ARGS \
+    > $LOG_DIR/exp_90011.txt 2>&1 &
+
+wait
+
+echo ""
+echo "predicting... (9/9)"
+echo "this will take ~6 min"
+echo "you can check progress from $LOG_DIR/*.txt"
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/test_net.py \
+    --exp_id 90012 \
+    $FLOOD_ARGS \
+    > $LOG_DIR/exp_90012.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=1 python tools/test_net.py \
+    --exp_id 90013 \
+    $FLOOD_ARGS \
+    > $LOG_DIR/exp_90013.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=2 python tools/test_net.py \
+    --exp_id 90014 \
+    $FLOOD_ARGS \
+    > $LOG_DIR/exp_90014.txt 2>&1 &
+
 wait
 
 # ensemble
@@ -240,21 +272,24 @@ python tools/ensemble.py --exp_id 50000 50001 50002 50003 50004 60400 60401 6040
 python tools/ensemble.py --exp_id 50010 50011 50012 50013 50014 60420 60421 60422 60423 60424 --root_dir $TEST_DIR
 python tools/ensemble.py --exp_id 80000 80001 80002 80003 80004 --root_dir $TEST_DIR
 python tools/ensemble.py --exp_id 80500 80501 80502 80503 80504 --root_dir $TEST_DIR
+python tools/ensemble.py --exp_id 90010 90011 90012 90013 90014 --root_dir $TEST_DIR
 
 # postprocess
 FOUNDATION_DIR="exp_50000-50001-50002-50003-50004-60400-60401-60402-60403-60404"
 FLOOD_DIR="exp_50010-50011-50012-50013-50014-60420-60421-60422-60423-60424"
 ROAD_DIR="exp_80000-80001-80002-80003-80004"
 BUILDING_DIR="exp_80500-80501-80502-80503-80504"
+FLOOD_BUILDING_DIR="exp_90010-90011-90012-90013-90014"
 
-python tools/refine_road_mask.py --foundation /wdata/ensembled_preds/$FOUNDATION_DIR --road /wdata/ensembled_preds/$ROAD_DIR
-python tools/refine_building_mask.py --foundation /wdata/refined_preds/$FOUNDATION_DIR --building /wdata/ensembled_preds/$BUILDING_DIR
+python tools/refine_road_mask.py --foundation /wdata/ensembled_preds/$FOUNDATION_DIR --road /wdata/ensembled_preds/$ROAD_DIR  # foundation: ensembled_preds -> refined_preds
+python tools/refine_building_mask.py --foundation /wdata/refined_preds/$FOUNDATION_DIR --building /wdata/ensembled_preds/$BUILDING_DIR  # foundation: refined_preds -> refined_preds_2
+python tools/refine_flood_building_mask.py --flood /wdata/ensembled_preds/$FLOOD_DIR --building /wdata/ensembled_preds/$FLOOD_BUILDING_DIR  # flood: ensembled_preds -> refined_preds_3
 
-python tools/building/postproc_building.py --foundation /wdata/refined_preds_2/$FOUNDATION_DIR --flood /wdata/ensembled_preds/$FLOOD_DIR
+python tools/building/postproc_building.py --foundation /wdata/refined_preds_2/$FOUNDATION_DIR --flood /wdata/refined_preds_3/$FLOOD_DIR
 
 python tools/road/vectorize.py --foundation /wdata/refined_preds_2/$FOUNDATION_DIR
 python tools/road/to_graph.py --vector /wdata/road_vectors/$FOUNDATION_DIR
-python tools/road/insert_flood.py --graph /wdata/road_graphs/$FOUNDATION_DIR --flood /wdata/ensembled_preds/$FLOOD_DIR
+python tools/road/insert_flood.py --graph /wdata/road_graphs/$FOUNDATION_DIR --flood /wdata/refined_preds_3/$FLOOD_DIR
 
 POSTPROCESSED_DIR="exp_50000-50001-50002-50003-50004-60400-60401-60402-60403-60404_50010-50011-50012-50013-50014-60420-60421-60422-60423-60424"
 python tools/submit.py --building /wdata/building_submissions/$POSTPROCESSED_DIR --road /wdata/road_submissions/$POSTPROCESSED_DIR --out $OUT_PATH

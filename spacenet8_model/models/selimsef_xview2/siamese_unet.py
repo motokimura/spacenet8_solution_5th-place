@@ -9,7 +9,8 @@ from functools import partial
 
 import torch.hub
 from efficientnet_pytorch import EfficientNet, get_model_params
-from torch.nn import Dropout2d, ModuleList, Sequential, UpsamplingBilinear2d
+from torch.nn import (Dropout2d, ModuleList, Sequential, Upsample,
+                      UpsamplingBilinear2d)
 from torch.utils import model_zoo
 
 from . import resnet
@@ -212,7 +213,7 @@ class SiameseEncoderDecoder(AbstractModel):
         self.decoder_stages = nn.ModuleList([self.get_decoder(idx) for idx in range(0, len(self.decoder_filters))])
 
         if self.first_layer_stride_two:
-            self.last_upsample = UpsamplingBilinear2d(scale_factor=2)
+            self.last_upsample = Upsample(scale_factor=2)  # motokimura replaced UpsamplingBilinear2d with Upsample to use deterministic algorithm
         self.final = self.make_final_classifier(
             self.last_upsample_filters if self.first_layer_stride_two else self.decoder_filters[0], num_classes)
         self._initialize_weights()
