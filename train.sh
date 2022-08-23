@@ -34,7 +34,7 @@ ARGS=" --override_model_dir /work/models --disable_wandb Data.train_dir=$TRAIN_D
 #ARGS=$ARGS" General.epochs=2"
 
 echo ""
-echo "training... (1/8)"
+echo "training... (1/9)"
 echo "this will take ~4 hours"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -73,7 +73,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
 wait
 
 echo ""
-echo "training... (2/8)"
+echo "training... (2/9)"
 echo "this will take ~4 hours"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -112,7 +112,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
 wait
 
 echo ""
-echo "training... (3/8)"
+echo "training... (3/9)"
 echo "this will take ~3 hours"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -153,7 +153,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
 wait
 
 echo ""
-echo "training... (4/8)"
+echo "training... (4/9)"
 echo "this will take ~4 hours"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -196,7 +196,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
 wait
 
 echo ""
-echo "training... (5/8)"
+echo "training... (5/9)"
 echo "this will take ~4 hours"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -239,7 +239,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
 wait
 
 echo ""
-echo "training... (6/8)"
+echo "training... (6/9)"
 echo "this will take ~3 hours"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -278,7 +278,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
 wait
 
 echo ""
-echo "training... (7/8)"
+echo "training... (7/9)"
 echo "this will take ~3 hours"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -317,7 +317,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
 wait
 
 echo ""
-echo "training... (8/8)"
+echo "training... (8/9)"
 echo "this will take ~3 hours"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -336,6 +336,58 @@ nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
     --pretrained_path /work/selimsef_xview2_models/localization_densenet_unet_densenet161_3_0_best_dice \
     $ARGS \
     > $LOG_DIR/exp_80504.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
+    --task flood_selimsef_xview2 \
+    --exp_id 90010 \
+    --fold_id 0 \
+    --pretrained_path /work/selimsef_xview2_models/pseudo_densenet_seamese_unet_shared_densenet161_0_best_xview \
+    --config configs/flood_selimsef_xview2/ema_e80.yaml \
+    $ARGS \
+    > $LOG_DIR/exp_90010.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
+    --task flood_selimsef_xview2 \
+    --exp_id 90011 \
+    --fold_id 1 \
+    --pretrained_path /work/selimsef_xview2_models/pseudo_densenet_seamese_unet_shared_densenet161_2_best_xview \
+    --config configs/flood_selimsef_xview2/ema_e80.yaml \
+    $ARGS \
+    > $LOG_DIR/exp_90011.txt 2>&1 &
+
+wait
+
+echo ""
+echo "training... (9/9)"
+echo "this will take ~3 hours"
+echo "you can check progress from $LOG_DIR/*.txt"
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
+    --task flood_selimsef_xview2 \
+    --exp_id 90012 \
+    --fold_id 2 \
+    --pretrained_path /work/selimsef_xview2_models/pseudo_densenet_seamese_unet_shared_densenet161_0_best_xview \
+    --config configs/flood_selimsef_xview2/ema_e80.yaml \
+    $ARGS \
+    > $LOG_DIR/exp_90012.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
+    --task flood_selimsef_xview2 \
+    --exp_id 90013 \
+    --fold_id 3 \
+    --pretrained_path /work/selimsef_xview2_models/pseudo_densenet_seamese_unet_shared_densenet161_2_best_xview \
+    --config configs/flood_selimsef_xview2/ema_e80.yaml \
+    $ARGS \
+    > $LOG_DIR/exp_90013.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
+    --task flood_selimsef_xview2 \
+    --exp_id 90014 \
+    --fold_id 4 \
+    --pretrained_path /work/selimsef_xview2_models/pseudo_densenet_seamese_unet_shared_densenet161_0_best_xview \
+    --config configs/flood_selimsef_xview2/ema_e80.yaml \
+    $ARGS \
+    > $LOG_DIR/exp_90014.txt 2>&1 &
 
 wait
 

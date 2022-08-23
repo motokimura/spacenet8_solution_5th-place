@@ -62,18 +62,24 @@ RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_60421.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_60422.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_60423.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_60424.zip
-# se-resnext50 foundation (road only)
+# se-resnext50 foundation (road only, finetuned from XD_XD's unet)
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80000.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80001.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80002.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80003.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80004.zip
-# densenet161 foundation (building only)
+# densenet161 foundation (building only, finetuned from selimsef's unet)
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80500.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80501.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80502.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80503.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80504.zip
+# densenet161 flood (building only, finetuned from selimsef's siamese unet)
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_90010.zip
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_90011.zip
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_90012.zip
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_90013.zip
+RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_90014.zip
 RUN unzip "*.zip" && rm -f *.zip
 
 # copy files
