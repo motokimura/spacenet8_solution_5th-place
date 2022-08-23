@@ -20,17 +20,6 @@ RUN git clone https://github.com/qubvel/segmentation_models.pytorch.git /smp
 WORKDIR /smp
 RUN git checkout 740dab561ccf54a9ae4bb5bda3b8b18df3790025 && pip install .
 
-# copy files
-COPY configs /work/configs
-COPY scripts /work/scripts
-COPY spacenet8_model /work/spacenet8_model
-COPY tools /work/tools
-COPY *.sh /work/
-
-RUN chmod a+x /work/scripts/*.sh
-RUN chmod a+x /work/scripts/p3/*.sh
-RUN chmod a+x /work/*.sh
-
 # download selimsef's xView2 models (published under Apache 2.0 license)
 # https://github.com/selimsef/xview2_solution
 # https://github.com/selimsef/xview2_solution/releases/tag/0.0.1
@@ -84,6 +73,16 @@ RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80502.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80503.zip
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/exp_80504.zip
 RUN unzip "*.zip" && rm -f *.zip
+
+# copy files
+COPY configs /work/configs
+COPY spacenet8_model /work/spacenet8_model
+COPY tools /work/tools
+COPY test.sh /work/
+COPY train.sh /work/
+
+RUN chmod a+x /work/test.sh
+RUN chmod a+x /work/train.sh
 
 ENV PYTHONPATH $PYTHONPATH:/work
 
