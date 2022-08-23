@@ -34,7 +34,7 @@ ARGS=" --override_model_dir /work/models --disable_wandb Data.train_dir=$TRAIN_D
 #ARGS=$ARGS" General.epochs=2"
 
 echo ""
-echo "training... (1/5)"
+echo "training... (1/8)"
 echo "this will take ~4 hours"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -73,7 +73,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
 wait
 
 echo ""
-echo "training... (2/5)"
+echo "training... (2/8)"
 echo "this will take ~4 hours"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -112,7 +112,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
 wait
 
 echo ""
-echo "training... (3/5)"
+echo "training... (3/8)"
 echo "this will take ~3 hours"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -153,7 +153,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
 wait
 
 echo ""
-echo "training... (4/5)"
+echo "training... (4/8)"
 echo "this will take ~4 hours"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -196,7 +196,7 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
 wait
 
 echo ""
-echo "training... (5/5)"
+echo "training... (5/8)"
 echo "this will take ~4 hours"
 echo "you can check progress from $LOG_DIR/*.txt"
 
@@ -235,6 +235,107 @@ nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
     --config configs/flood/effnet-b6_ks7_ema_e80.yaml \
     $ARGS \
     > $LOG_DIR/exp_60424.txt 2>&1 &
+
+wait
+
+echo ""
+echo "training... (6/8)"
+echo "this will take ~3 hours"
+echo "you can check progress from $LOG_DIR/*.txt"
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
+    --task foundation_xdxd_sn5 \
+    --exp_id 80000 \
+    --fold_id 0 \
+    --pretrained_path /work/xdxd_sn5_models/xdxd_sn5_serx50_focal/fold0/fold0_best.pth \
+    $ARGS \
+    > $LOG_DIR/exp_80000.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
+    --task foundation_xdxd_sn5 \
+    --exp_id 80001 \
+    --fold_id 1 \
+    --pretrained_path /work/xdxd_sn5_models/xdxd_sn5_serx50_focal/fold1/fold1_best.pth \
+    $ARGS \
+    > $LOG_DIR/exp_80001.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
+    --task foundation_xdxd_sn5 \
+    --exp_id 80002 \
+    --fold_id 2 \
+    --pretrained_path /work/xdxd_sn5_models/xdxd_sn5_serx50_focal/fold2/fold2_best.pth \
+    $ARGS \
+    > $LOG_DIR/exp_80002.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
+    --task foundation_xdxd_sn5 \
+    --exp_id 80003 \
+    --fold_id 3 \
+    --pretrained_path /work/xdxd_sn5_models/xdxd_sn5_serx50_focal/fold3/fold3_best.pth \
+    $ARGS \
+    > $LOG_DIR/exp_80003.txt 2>&1 &
+
+wait
+
+echo ""
+echo "training... (7/8)"
+echo "this will take ~3 hours"
+echo "you can check progress from $LOG_DIR/*.txt"
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
+    --task foundation_xdxd_sn5 \
+    --exp_id 80004 \
+    --fold_id 4 \
+    --pretrained_path /work/xdxd_sn5_models/xdxd_sn5_serx50_focal/fold0/fold0_best.pth \
+    $ARGS \
+    > $LOG_DIR/exp_80004.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
+    --task foundation_selimsef_xview2 \
+    --exp_id 80500 \
+    --fold_id 0 \
+    --pretrained_path /work/selimsef_xview2_models/localization_densenet_unet_densenet161_3_0_best_dice \
+    $ARGS \
+    > $LOG_DIR/exp_80500.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=2 python tools/train_net.py \
+    --task foundation_selimsef_xview2 \
+    --exp_id 80501 \
+    --fold_id 1 \
+    --pretrained_path /work/selimsef_xview2_models/localization_densenet_unet_densenet161_3_1_best_dice \
+    $ARGS \
+    > $LOG_DIR/exp_80501.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=3 python tools/train_net.py \
+    --task foundation_selimsef_xview2 \
+    --exp_id 80502 \
+    --fold_id 2 \
+    --pretrained_path /work/selimsef_xview2_models/localization_densenet_unet_densenet161_3_0_best_dice \
+    $ARGS \
+    > $LOG_DIR/exp_80502.txt 2>&1 &
+
+wait
+
+echo ""
+echo "training... (8/8)"
+echo "this will take ~3 hours"
+echo "you can check progress from $LOG_DIR/*.txt"
+
+nohup env CUDA_VISIBLE_DEVICES=0 python tools/train_net.py \
+    --task foundation_selimsef_xview2 \
+    --exp_id 80503 \
+    --fold_id 3 \
+    --pretrained_path /work/selimsef_xview2_models/localization_densenet_unet_densenet161_3_1_best_dice \
+    $ARGS \
+    > $LOG_DIR/exp_80503.txt 2>&1 &
+
+nohup env CUDA_VISIBLE_DEVICES=1 python tools/train_net.py \
+    --task foundation_selimsef_xview2 \
+    --exp_id 80504 \
+    --fold_id 4 \
+    --pretrained_path /work/selimsef_xview2_models/localization_densenet_unet_densenet161_3_0_best_dice \
+    $ARGS \
+    > $LOG_DIR/exp_80504.txt 2>&1 &
 
 wait
 
