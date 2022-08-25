@@ -17,6 +17,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--exp_id', nargs='+', type=int, required=True)
     parser.add_argument('--root_dir', default='/data/test')
+    parser.add_argument('--val', action='store_true')
+    parser.add_argument('--fold_id', type=int)
     parser.add_argument('--artifact_dir', default='/wdata')
     return parser.parse_args()
 
@@ -26,7 +28,10 @@ def ensemble(pre_image_info, args):
     aoi = pre_image_info['aoi']
 
     for i, exp_id in enumerate(args.exp_id):
-        pred_path = os.path.join(args.artifact_dir, 'preds', f'exp_{exp_id:05d}', aoi, pre_fn)
+        if args.val:
+            pred_path = os.path.join(args.artifact_dir, '_val/preds', f'exp_{exp_id:05d}', aoi, pre_fn)
+        else:
+            pred_path = os.path.join(args.artifact_dir, 'preds', f'exp_{exp_id:05d}', aoi, pre_fn)
         pred = io.imread(pred_path).astype(float)
 
         if len(pred.shape) == 2:
@@ -51,7 +56,10 @@ def ensemble(pre_image_info, args):
     for exp_id in args.exp_id:
         exp_dir += f'{exp_id:05d}-'
     exp_dir = exp_dir[:-1]  # remove '-'
-    out_dir = os.path.join(args.artifact_dir, 'ensembled_preds', exp_dir, aoi)
+    if args.val:
+        out_dir = os.path.join(args.artifact_dir, '_val/ensembled_preds', exp_dir, aoi)
+    else:
+        out_dir = os.path.join(args.artifact_dir, 'ensembled_preds', exp_dir, aoi)
     os.makedirs(out_dir, exist_ok=True)
 
     out_path = os.path.join(out_dir, pre_fn)
@@ -61,7 +69,10 @@ def ensemble(pre_image_info, args):
 def main():
     args = parse_args()
 
-    df = pd.read_csv(os.path.join(args.artifact_dir, 'test.csv'))
+    if args.val:
+        df = pd.read_csv(os.path.join(args.artifact_dir, f'folds_v3/val_{args.fold_id}.csv'))
+    else:
+        df = pd.read_csv(os.path.join(args.artifact_dir, 'test.csv'))
     pre_image_info = []
     for i, row in df.iterrows():
         pre_image_info.append({
