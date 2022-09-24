@@ -13,7 +13,7 @@
 - Handle: motokimura
 - Placement you achieved:
 - About you: A computer vision research engineer working at a MaaS startup company in Tokyo. I often enjoy data science competitions related with remote sensing imageries and SpaceNet challenges are my most favorite.
-- Why you participated in the challenge: SpaceNet-8 gave new challenging tasks for me: road network extraction and flood detection from pre- and post-event images. I thought I could learn a lot of new techniques (e.g., how to handle pre- and post-event images, how to extract road networks from segmentation results, etc.) through this challenge.
+- Why you participated in the challenge: SpaceNet-8 provides 2 challenging tasks for me: road network extraction and flood detection from pre- and post-event images. I thought I could learn a lot of new techniques (e.g., how to handle pre- and post-event images, how to extract road networks from segmentation results, etc.) through this challenge.
 
 ## 2. Solution Development
 
@@ -22,12 +22,12 @@
 - I started by looking at all tiles in the dataset with the images and labels side by side. I noticed that some tiles had errors in the annotations. I decided to exclude these tiles from training and validation.
 - At the same time, I noticed that in tiles with two post-event images, there were cases where one of the post-event images was almost completely black, severely misaligned with the pre-event image, or covered by clouds. I calculated the MSE (mean squared error) between the pre-event image and each of the post-event images, and only used the post-event image with the smaller MSE in order to discard such inappropriate post-event images.
 - I also found that there were relatively few flood labels in the dataset and that in some tiles flood pixels are concentrated at the edges of the image. To increase the data, I generated new training samples by joining four adjacent tiles together. Note that such "mosaicing" was done only for the training set, and the inference was done independently for each tile in the test set.
-- For algorithm development, given the relatively short competition period, I decided to follow the pipeline used in the baseline solution (building and road detection by U-Net, flood detection by Siamese U-Net, and post-processing) and focus on improving the U-Net and Siamese U-Net models.
+- For algorithm development, given the relatively short competition period, I decided to follow the pipeline used in the baseline solution (building and road detection by U-Net, flood detection by Siamese U-Net, and post-processing) and focus on improving the models.
 - When the dataset is relatively small, the random seed used in training can have a significant impact on the validation metric [as pointed out by SpaceNet-6 winner zbigniewwojna](https://github.com/SpaceNetChallenge/SpaceNet_SAR_Buildings_Solutions/blob/master/1-zbigniewwojna/README.md). I used fixed seed for each fold so that I could compare the results more accurately.
 - For both U-Net and Siamese U-Net models, I tried various backbone networks (e.g., EfficientNet, EfficientNetV2, RegNet, etc.) and found EfficientNet was the best. I experimented with EfficientNet-B3 to try various training configurations in a shorter period, and switched to EfficientNet-B5/B6 in the latter half of the competition.
-- For the Siamese U-Net models used for flood detection, the validation metric varied significantly from epoch to epoch. I found that applying EMA (exponential moving averaging) to the model weights and using larger (7x7) kernel in the penultimate convolution layer could mitigate the instability to some extent. I also tried tuning lr schedules and different optimizers but none of them helped.
+- For the Siamese U-Net models used for the flood detection, the validation metric varied significantly from epoch to epoch. I found that applying EMA (exponential moving averaging) to the model weights and using larger (7x7) kernel in the penultimate convolution layer could mitigate the instability to some extent. I also tried tuning lr schedule and different optimizers but they did not help.
 - A week before the competition deadline, I noticed that finetuning SpaceNet-5 and xView2 winners' pretrained models significantly improved the scores, so I added these pretrained models to the ensemble.
-- To optimize the post-processing, I used the visualization tool provided by the competition organizer. I attempted to improve the baseline post-processing algorithm, but since it was already well tuned, only a few changes were made, such as adjusting the detection thresholds.
+- To optimize the post-processing, I used the visualization tool provided by the competition organizer. I attempted to improve the baseline post-processing algorithm, but because it was already well tuned, only a few changes were made such as adjusting the detection thresholds.
 
 ## 3. Final Approach
 
@@ -36,12 +36,12 @@
 > performance.
 
 - Data Cleaning and Pre-processing
-  - I removed some tiles which contains annotation errors from training and validation. See `pre_image_blacklist` field in `configs/defaults/foundation.yaml` and `configs/defaults/flood.yaml` of my solution code to know which tiles are removed.
+  - I excluded some tiles which contain annotation errors from training and validation. See `pre_image_blacklist` field in `configs/defaults/foundation.yaml` and `configs/defaults/flood.yaml` in my solution to know which tiles are removed.
   - For the tiles with 2 post-event images, the MSE between the pre-event image and each of the post-event images was calculated, and only the post-event image with the smaller MSE was used. This was done to discard the inappropriate post-event images, such as those that were almost completely black, misaligned with the pre-event image, or covered by clouds.
   - To increase the data, I generated new training samples by joining four adjacent tiles in the same fold together. Note that such "mosaicing" was done only for the training set, and the inference was done independently for each tile in the test set.
 - Validation
   - Done by 5-fold cross validation.
-  - I found the training tiles could be divided into 4 geographically adjacent groups by using the pre-event image file name prefix (`105001001A0FFC00_0`, `10400100684A4B00_1`, `10300100AF395C00_2`, and `10500500C4DD7000_0`). I split each group into 5 segments by longitude and latitude, and combined 4 segments picked from each group into one fold. For more details, see `tools/make_folds_v3.py` of my solution code.
+  - I found the training tiles could be divided into 4 geographically adjacent groups by using the pre-event image file name prefix (`105001001A0FFC00_0`, `10400100684A4B00_1`, `10300100AF395C00_2`, and `10500500C4DD7000_0`). I split each group into 5 segments by longitude and latitude, and combined 4 segments picked from each group into one fold. For more details, see `tools/make_folds_v3.py` in my solution.
 - Models
   - Building and Road Segmentation
     - U-Net (EfficientNet-B5) x 5 folds & U-Net (EfficientNet-B6) x 5 folds
@@ -55,15 +55,15 @@
   - Flood Segmentation
     - Siamese U-Net (EfficientNet-B5) x 5 folds & Siamese U-Net (EfficientNet-B6) x 5 folds
       - Siamese U-Net inputs pre- and post-event images separately to U-Net, concatenates decoder outputs, and apply 7x7 convolution and 1x1 convolution.
-      - U-Net in the flood segmentation model was initialized with the corresponding building and road segmentation model. Finetuning from the pretrained weights enabled faster convergence and better accuracy.
+      - U-Net in the siamese network was initialized with the corresponding building and road segmentation model. Finetuning from the pretrained weights enabled faster convergence and better accuracy.
     - 4 output channels: flooded building, non-flooded building, flooded road, and non-flooded road
     - Loss: 1 * dice + 1 * bce
     - Random crop size: 320x320, batch size: 8, optimizer: Adam, lr: 1e-4.
     - Trained 80 epochs with the constant lr.
-    - EMA was applied to model weights (momentum: 2e-3, interval: 1 epoch) to improve training stability.
+    - EMA (momentum: 2e-3, interval: 1 epoch) was applied to model weights to improve training stability.
   - Road Segmentation with SpaceNet-5 pretrained models
     - U-Net (SE-ResNeXt-50) x 5 folds
-      - [SpaceNet-5 winner XD_XD's U-Net](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd) finetuned on SpaceNet-8 road labels.
+      - [SpaceNet-5 winner XD_XD's U-Net](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd) was finetuned on SpaceNet-8 road labels.
       - Since SpaceNet-5 dataset covers more diverse cities, finetuning from the XD_XD's pretrained weights improved the road segmentation results significantly (+0.89 in the public LB).
     - 1 output channel: road skelton
     - Loss: 1 * dice + 1 * bce
@@ -71,7 +71,7 @@
     - Trained 120 epochs decaying lr by 0.1 at epoch 80.
   - Building Segmentation with xView2 pretrained models
     - U-Net (DenseNet-161) x 5 folds
-      - [xView2 2nd place selim_sef's U-Net](https://github.com/DIUx-xView/xView2_second_place) finetuned on SpaceNet-8 building labels.
+      - [xView2 2nd place selim_sef's U-Net](https://github.com/DIUx-xView/xView2_second_place) was finetuned on SpaceNet-8 building labels.
       - Finetuning from the selim_sef's pretrained weights improved the building segmentation results moderately (+0.32 in the public LB).
     - 1 output channel: building body
     - Loss: 1 * dice + 1 * bce
@@ -79,19 +79,19 @@
     - Trained 120 epochs decaying lr by 0.1 at epoch 80.
   - Flooded Building Segmentation with xView2 pretrained models
     - Siamese U-Net (DenseNet-161) x 5 folds
-      - [xView2 2nd place selim_sef's Siamese U-Net](https://github.com/DIUx-xView/xView2_second_place) finetuned on SpaceNet-8 flood labels.
+      - [xView2 2nd place selim_sef's Siamese U-Net](https://github.com/DIUx-xView/xView2_second_place) was finetuned on SpaceNet-8 flood labels.
       - Finetuning from the selim_sef's pretrained weights improved the flood segmentation results moderately (+0.56 in the public LB).
     - 2 output channels: flooded building and non-flooded building
     - Loss: 1 * dice + 1 * bce
     - Random crop size: 352x352, batch size: 10, optimizer: Adam, lr: 1e-5.
     - Trained 80 epochs with the constant lr.
-    - EMA was applied to model weights (momentum: 2e-3, interval: 1 epoch) to improve training stability.
+    - EMA (momentum: 2e-3, interval: 1 epoch) was applied to model weights to improve training stability.
 - Post-processing
     - Post-processing is the same as the baseline except for the following:
       - Thresholds for the model outputs were adjusted.
         - Building: score_thresh=0.5, flood_score_thresh=0.6, flood_area_thresh=0.5
         - Road: score_thresh=0.3, flood_score_thresh=0.3, flood_area_thresh=0.3
-      - Dilation with a 5x5 kernel was applied to flooded road mask to cope with the small misalignment between the road skelton and flooded road mask.
+      - Dilation with a 5x5 kernel was applied to the flooded road mask to cope with the small misalignment between the road skelton and the flooded road mask.
 - Others
   - Average ensemble was performed to combine the outputs from different models.
     - Building: 0.25 * `U-Net (EfficientNet-B5)` + 0.25 * `U-Net (EfficientNet-B6)` + 0.5 * `U-Net (DenseNet-161)`
@@ -106,7 +106,7 @@
 
 > Please specify the name of the open source resource, the URL to where it can be found, and it’s license type:
 
-Please see `licenses/README.md` of my solution code.
+Please see `licenses/README.md` in my solution.
 
 ## 5. Potential Algorithm Improvements
 
@@ -121,31 +121,38 @@ Please see `licenses/README.md` of my solution code.
 > Please specify any potential limitations with the algorithm:
 
 - The algorithm often fails to detect the unpaved roads covered by muddy water, possibly because the appearance of these roads is similar before and after the event. 
-- It often makes false positives when there are large differences in appearance between pre- and post-event images (due to differences in viewing angles, light conditions, and seasonal vegetation changes).
+- The algorithm sometimes makes false positives when there are large differences in appearance between pre- and post-event images (due to differences in viewing angles, light conditions, and seasonal vegetation changes).
 - As I used 35 models in total, training and inference take time.
 
 ## 7. Deployment Guide
 
 > Please provide the exact steps required to build and deploy the code:
 
+The solution follows [Topcoder's marathon-docker-template](https://github.com/topcoderinc/marathon-docker-template/tree/master/data-plus-code-style),
+and is assumed to be run on a p3.8xlarge Linux AWS instance.
+
+Setup the instance and download SpaceNet-8 dataset by following `docs/ec2_setup.md`.
+
+Then, run following:
+
 ```
 nvidia-docker build -t motokimura .
 nvidia-docker run --ipc=host -v <local_data_path>:/data:ro -v <local_writable_area_path>:/wdata -it motokimura
 ```
-
-Assumed to be run on a p3.8xlarge Linux AWS instance.
 
 ## 8. Final Verification
 
 > Please provide instructions that explain how to train the algorithm and have it execute
 > against sample data:
 
+Again, the solution is assumed to be run on a p3.8xlarge Linux AWS instance.
+
+Run following in the container:
+
 ```
 ./train.sh /data/train/
 ./test.sh /data/test/ ./output.csv
 ```
-
-Assumed to be run on a p3.8xlarge Linux AWS instance.
 
 ## 9. Feedback
 
@@ -155,8 +162,8 @@ Assumed to be run on a p3.8xlarge Linux AWS instance.
 - Problem Statement
   - It was well described and easy to understand for me.
 - Data
-  - Thank you for making this awesome dataset public! It is easy to imagine how difficult it was to prepare this dataset.
-  - It would be even better if annotation errors could be reduced and more AOIs are included.
+  - Thank you for making this awesome dataset public! I can imagine how hard it was to prepare this dataset.
+  - It would be even better if the annotation errors could be reduced and more AOIs are included.
 - Contest
   - The baseline algorithm was easy to understand and I found it a good starting point.
   - The visualization tool was really helpful for the validation.
