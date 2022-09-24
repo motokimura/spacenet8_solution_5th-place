@@ -17,7 +17,7 @@ Open Source Resources, Frameworks and Libraries used by this solution.
 SpaceNet-5 pre-trained models and xView2 pre-trained models are downloaded during docker build (see Dockerfile for the download link).
 
 SpaceNet-5 pre-trained unet is uploaded to my own AWS S3 (`https://motokimura-public-sn8.s3.amazonaws.com/xdxd_sn5_serx50_focal.zip`).
-Please see `prepare_sn5_XD_XD_models.md` to know how I prepared this model.
+Please see `docs/prepare_sn5_XD_XD_models.md` to know how I prepared this model.
 
 ## Environment setup:
 

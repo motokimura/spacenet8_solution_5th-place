@@ -30,7 +30,7 @@ RUN wget -nv https://github.com/selimsef/xview2_solution/releases/download/0.0.1
 RUN wget -nv https://github.com/selimsef/xview2_solution/releases/download/0.0.1/pseudo_densenet_seamese_unet_shared_densenet161_2_best_xview
 
 # download XD_XD's SpaceNet-5 winning models
-# see prepare_sn5_XD_XD_models.md to know how I prepared these models
+# see docs/prepare_sn5_XD_XD_models.md to know how I prepared these models
 WORKDIR /work/xdxd_sn5_models
 RUN wget -nv https://motokimura-public-sn8.s3.amazonaws.com/xdxd_sn5_serx50_focal.zip
 RUN unzip xdxd_sn5_serx50_focal.zip && rm -f xdxd_sn5_serx50_focal.zip
