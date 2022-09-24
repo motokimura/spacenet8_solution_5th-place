@@ -20,7 +20,7 @@
 > How did you solve the problem? What approaches did you try and what choices did you make, and why? Also, what alternative approaches did you consider?
 
 - I started by looking at all tiles in the dataset with the images and labels side by side. I noticed that some tiles had errors in the annotations. I decided to exclude these tiles from training and validation.
-- At the same time, I noticed that in tiles with two post-event images, there were cases where one of the post-event images was almost completely black, severely misaligned with the pre-event image, or covered by clouds. I calculated the MSE (mean squared error) between the pre-event image and each of the post-event images, and only used the post-event image with the smaller MSE in order to discard such inappropriate post-event images.
+- At the same time, I noticed that in tiles with two post-event images, there were cases where one of the post-event images was severely misaligned with the pre-event image, covered by clouds, or almost completely black. I calculated the MSE (mean squared error) between the pre-event image and each of the post-event images, and only used the post-event image with the smaller MSE in order to discard such inappropriate post-event images.
 
 ![](figure_01.jpg)
 
@@ -45,7 +45,7 @@
 
 - Data Cleaning and Pre-processing
   - I excluded some tiles which contain annotation errors from training and validation. See `pre_image_blacklist` field in `configs/defaults/foundation.yaml` and `configs/defaults/flood.yaml` in my solution to know which tiles are removed.
-  - For the tiles with 2 post-event images, the MSE between the pre-event image and each of the post-event images was calculated, and only the post-event image with the smaller MSE was used. This was done to discard the inappropriate post-event images, such as those that were almost completely black, misaligned with the pre-event image, or covered by clouds.
+  - For the tiles with 2 post-event images, the MSE between the pre-event image and each of the post-event images was calculated, and only the post-event image with the smaller MSE was used. This was done to discard the inappropriate post-event images, such as those that were misaligned with the pre-event image, covered by clouds, or almost completely black.
   - To increase the data, I generated new training samples by joining four adjacent tiles in the same fold together. Note that such "mosaicing" was done only for the training set, and the inference was done independently for each tile in the test set.
 - Validation
   - Done by 5-fold cross validation.
