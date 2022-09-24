@@ -35,6 +35,8 @@
 > ideas/decisions/features have been found to be the most important for your solution
 > performance.
 
+![](figure_01.png)
+
 - Data Cleaning and Pre-processing
   - I excluded some tiles which contain annotation errors from training and validation. See `pre_image_blacklist` field in `configs/defaults/foundation.yaml` and `configs/defaults/flood.yaml` in my solution to know which tiles are removed.
   - For the tiles with 2 post-event images, the MSE between the pre-event image and each of the post-event images was calculated, and only the post-event image with the smaller MSE was used. This was done to discard the inappropriate post-event images, such as those that were almost completely black, misaligned with the pre-event image, or covered by clouds.
