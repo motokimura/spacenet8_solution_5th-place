@@ -1,8 +1,8 @@
 # motokimura's solution for SpaceNet-8 challenge
 
-See [licenses/README.md](licenses/README.md) to see open source resources, frameworks, libraries, etc. used in this solution.
+**Please ignore the description below in the final scoring phase** (it is only for the solution development phase).
 
-**Please ignore the description below** (it is only for the solution development phase).
+See also [docs/ec2_setup](docs/ec2_setup).
 
 ## docker build
 
