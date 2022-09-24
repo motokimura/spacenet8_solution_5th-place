@@ -21,6 +21,9 @@
 
 - I started by looking at all tiles in the dataset with the images and labels side by side. I noticed that some tiles had errors in the annotations. I decided to exclude these tiles from training and validation.
 - At the same time, I noticed that in tiles with two post-event images, there were cases where one of the post-event images was almost completely black, severely misaligned with the pre-event image, or covered by clouds. I calculated the MSE (mean squared error) between the pre-event image and each of the post-event images, and only used the post-event image with the smaller MSE in order to discard such inappropriate post-event images.
+
+![](figure_01.jpg)
+
 - I also found that there were relatively few flood labels in the dataset and that in some tiles flood pixels are concentrated at the edges of the image. To increase the data, I generated new training samples by joining four adjacent tiles together. Note that such "mosaicing" was done only for the training set, and the inference was done independently for each tile in the test set.
 
 ![](figure_02.jpg)
@@ -38,7 +41,7 @@
 > ideas/decisions/features have been found to be the most important for your solution
 > performance.
 
-![](figure_01.jpg)
+![](figure_03.jpg)
 
 - Data Cleaning and Pre-processing
   - I excluded some tiles which contain annotation errors from training and validation. See `pre_image_blacklist` field in `configs/defaults/foundation.yaml` and `configs/defaults/flood.yaml` in my solution to know which tiles are removed.
