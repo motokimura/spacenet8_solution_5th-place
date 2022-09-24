@@ -63,7 +63,7 @@
     - EMA (momentum: 2e-3, interval: 1 epoch) was applied to model weights to improve training stability.
   - Road Segmentation with SpaceNet-5 pretrained models
     - U-Net (SE-ResNeXt-50) x 5 folds
-      - [SpaceNet-5 winner XD_XD's U-Net](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd) was finetuned on SpaceNet-8 road labels.
+      - [SpaceNet-5 winner XD_XD's U-Net models](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd) were finetuned on SpaceNet-8 road labels.
       - Since SpaceNet-5 dataset covers more diverse cities, finetuning from the XD_XD's pretrained weights improved the road segmentation results significantly (+0.89 in the public LB).
     - 1 output channel: road skelton
     - Loss: 1 * dice + 1 * bce
@@ -71,7 +71,7 @@
     - Trained 120 epochs decaying lr by 0.1 at epoch 80.
   - Building Segmentation with xView2 pretrained models
     - U-Net (DenseNet-161) x 5 folds
-      - [xView2 2nd place selim_sef's U-Net](https://github.com/DIUx-xView/xView2_second_place) was finetuned on SpaceNet-8 building labels.
+      - [xView2 2nd place selim_sef's U-Net models](https://github.com/DIUx-xView/xView2_second_place) were finetuned on SpaceNet-8 building labels.
       - Finetuning from the selim_sef's pretrained weights improved the building segmentation results moderately (+0.32 in the public LB).
     - 1 output channel: building body
     - Loss: 1 * dice + 1 * bce
@@ -79,7 +79,7 @@
     - Trained 120 epochs decaying lr by 0.1 at epoch 80.
   - Flooded Building Segmentation with xView2 pretrained models
     - Siamese U-Net (DenseNet-161) x 5 folds
-      - [xView2 2nd place selim_sef's Siamese U-Net](https://github.com/DIUx-xView/xView2_second_place) was finetuned on SpaceNet-8 flood labels.
+      - [xView2 2nd place selim_sef's Siamese U-Net models](https://github.com/DIUx-xView/xView2_second_place) were finetuned on SpaceNet-8 flood labels.
       - Finetuning from the selim_sef's pretrained weights improved the flood segmentation results moderately (+0.56 in the public LB).
     - 2 output channels: flooded building and non-flooded building
     - Loss: 1 * dice + 1 * bce
