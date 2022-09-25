@@ -29,9 +29,9 @@
 ![](figure_02.jpg)
 
 - For algorithm development, given the relatively short competition period, I decided to follow the pipeline used in the baseline solution (building and road detection by U-Net, flood detection by Siamese U-Net, and post-processing) and focus on improving the models.
-- When the dataset is relatively small, the random seed used in training can have a significant impact on the validation metric [as pointed out by SpaceNet-6 winner zbigniewwojna](https://github.com/SpaceNetChallenge/SpaceNet_SAR_Buildings_Solutions/blob/master/1-zbigniewwojna/README.md). I used fixed seed for each fold so that I could compare the results more accurately.
+- When the dataset is relatively small, the random seed used in training can have a significant impact on the validation metric [as pointed out by SpaceNet-6 winner zbigniewwojna](https://github.com/SpaceNetChallenge/SpaceNet_SAR_Buildings_Solutions/blob/master/1-zbigniewwojna/README.md). I used a fixed seed for each fold so that I could compare the results more accurately.
 - For both U-Net and Siamese U-Net models, I tried various backbone networks (e.g., EfficientNet, EfficientNetV2, RegNet, etc.) and found EfficientNet was the best. I experimented with EfficientNet-B3 to try various training configurations in a shorter period, and switched to EfficientNet-B5/B6 in the latter half of the competition.
-- For the Siamese U-Net models used for the flood detection, the validation metric varied significantly from epoch to epoch. I found that applying EMA (exponential moving averaging) to the model weights and using larger (7x7) kernel in the penultimate convolution layer could mitigate the instability to some extent. I also tried tuning lr schedule and different optimizers but they did not help.
+- For the Siamese U-Net models used for the flood detection, the validation metric varied significantly from epoch to epoch. I found that applying EMA (exponential moving averaging) to the model weights and using larger (7x7) kernel in the penultimate convolution layer could mitigate the instability to some extent. I also tried tuning the lr schedule and different optimizers but they did not help.
 - A week before the competition deadline, I noticed that finetuning SpaceNet-5 and xView2 winners' pretrained models significantly improved the score, so I added these pretrained models to the ensemble.
 - To optimize the post-processing, I used the visualization tool provided by the competition organizer. I attempted to improve the baseline post-processing algorithm, but because it was already well tuned, only a few changes were made such as adjusting the detection thresholds.
 
@@ -54,7 +54,7 @@
   - Building and Road Segmentation
     - U-Net (EfficientNet-B5) x 5 folds & U-Net (EfficientNet-B6) x 5 folds
     - 5 output channels: building body, building border, building contact, road skelton, and road junction
-      - 3-channel masks (building body, building border, and building contact) are often used in the previous SpaceNet challenges (e.g., in [cannab's 1st place solution for SpaceNet-4 challenge](https://github.com/SpaceNetChallenge/SpaceNet_Off_Nadir_Solutions/tree/master/cannab)), so I just followed it. Only the building body channel was used in the prediction phase.
+      - 3-channel masks (building body, building border, and building contact) were often used in the previous SpaceNet challenges (e.g., in [cannab's 1st place solution for SpaceNet-4 challenge](https://github.com/SpaceNetChallenge/SpaceNet_Off_Nadir_Solutions/tree/master/cannab)), so I just followed it. Only the building body channel was used in the prediction phase.
       - The road junction (areas within 16-pixel radius from the road intersections) was used as an auxiliary target so that the models pay more attention to the intersections. I borrowed this idea from [cannab's 2nd place solution for SpaceNet-5 challenge](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/cannab).
     - Loss: 1 * dice + 1 * bce
     - Random crop size: 448x448, batch size: 8, optimizer: Adam, base lr: 2e-4.
@@ -68,7 +68,7 @@
     - Loss: 1 * dice + 1 * bce
     - Random crop size: 320x320, batch size: 8, optimizer: Adam, lr: 1e-4.
     - Trained 80 epochs with the constant lr.
-    - EMA (momentum: 2e-3, interval: 1 epoch) was applied to model weights to improve training stability.
+    - EMA (momentum: 2e-3, interval: 1 epoch) was applied to the model weights to mitigate training instability.
   - Road Segmentation with SpaceNet-5 pretrained models
     - U-Net (SE-ResNeXt-50) x 5 folds
       - [SpaceNet-5 winner XD_XD's U-Net models](https://github.com/SpaceNetChallenge/SpaceNet_Optimized_Routing_Solutions/tree/master/xd_xd) were finetuned on SpaceNet-8 road labels.
@@ -93,13 +93,13 @@
     - Loss: 1 * dice + 1 * bce
     - Random crop size: 352x352, batch size: 10, optimizer: Adam, lr: 1e-5.
     - Trained 80 epochs with the constant lr.
-    - EMA (momentum: 2e-3, interval: 1 epoch) was applied to model weights to improve training stability.
+    - EMA (momentum: 2e-3, interval: 1 epoch) was applied to the model weights to mitigate training instability.
 - Post-processing
     - Post-processing is the same as the baseline except for the following:
       - Thresholds for the model outputs were adjusted.
         - Building: score_thresh=0.5, flood_score_thresh=0.6, flood_area_thresh=0.5
         - Road: score_thresh=0.3, flood_score_thresh=0.3, flood_area_thresh=0.3
-      - Dilation with a 5x5 kernel was applied to the flooded road mask to cope with the small misalignment between the road skelton and the flooded road mask.
+      - Dilation with a 5x5 kernel was applied to the flooded road mask to cope with small misalignments between the road skelton and the flooded road mask.
 - Others
   - Average ensemble was performed to combine the outputs from different models.
     - Building: 0.25 * `U-Net (EfficientNet-B5)` + 0.25 * `U-Net (EfficientNet-B6)` + 0.5 * `U-Net (DenseNet-161)`
@@ -120,7 +120,7 @@ Please see `licenses/README.md` in my solution.
 
 > Please specify any potential improvements that can be made to the algorithm:
 
-- I noticed pre- and post-event images have small misalignment in some tiles, and this could have caused the training instability of the flood detection models. The images could be aligned more precisely with image feature matching networks, such as SuperGlue and LoFTR.
+- I noticed pre- and post-event images have small misalignments in some tiles, and this could have caused the training instability of the flood detection models. The images could be aligned more precisely with image feature matching networks, such as SuperGlue and LoFTR.
 - Since the evaluation metric is sensitive to false positives in non-flooded tiles, post-processing to eliminate false positives, e.g., removing flooded roads below a certain length, would be effective.
 - Richer data augmentation. I only used random cropping during training.
 
@@ -128,7 +128,7 @@ Please see `licenses/README.md` in my solution.
 
 > Please specify any potential limitations with the algorithm:
 
-- The algorithm often fails to detect the unpaved roads covered by muddy water, possibly because the appearance of these roads is similar before and after the event. 
+- On unpaved roads covered with muddy water, the algorithm often fails to detect flooding. This may be due to the similar appearance of these roads before and after the event.
 - The algorithm sometimes makes false positives when there are large differences in appearance between pre- and post-event images (due to differences in viewing angles, light conditions, and seasonal vegetation changes).
 - As I used 35 models in total, training and inference take time.
 
