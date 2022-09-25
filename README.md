@@ -13,18 +13,18 @@
 - Handle: motokimura
 - Placement you achieved:
 - About you: A computer vision research engineer working at a MaaS startup company in Tokyo. I often enjoy data science competitions related with remote sensing imageries and SpaceNet challenges are my most favorite.
-- Why you participated in the challenge: SpaceNet-8 provides 2 challenging tasks for me: road network extraction and flood detection from pre- and post-event images. I thought I could learn a lot of new techniques (e.g., how to handle pre- and post-event images, how to extract road networks from segmentation results, etc.) through this challenge.
+- Why you participated in the challenge: SpaceNet-8 provides two challenging tasks for me: road network extraction and flood detection from pre- and post-event images. I thought I could learn a lot of new techniques (e.g., how to handle pre- and post-event images, how to extract road networks from segmentation results, etc.) through this challenge.
 
 ## 2. Solution Development
 
 > How did you solve the problem? What approaches did you try and what choices did you make, and why? Also, what alternative approaches did you consider?
 
 - I started by looking at all tiles in the dataset with the images and labels side by side. I noticed that some tiles had errors in the annotations. I decided to exclude these tiles from training and validation.
-- At the same time, I noticed that in tiles with two post-event images, there were cases where one of the post-event images was severely misaligned with the pre-event image, covered by clouds, or almost completely black. I calculated the MSE (mean squared error) between the pre-event image and each of the post-event images, and only used the post-event image with the smaller MSE in order to discard such inappropriate post-event images.
+- At the same time, I noticed that in tiles which have 2 post-event images, there were cases where one of the post-event images was severely misaligned with the pre-event image, covered by clouds, or almost completely black. To discard such inappropriate post-event images, I calculated the MSE (mean squared error) between the pre-event image and each of the post-event images, and only used the post-event image with the smaller MSE.
 
 ![](figure_01.jpg)
 
-- I also found that there were relatively few flood labels in the dataset and that in some tiles flood pixels are concentrated at the edges of the image. To increase the data, I generated new training samples by joining four adjacent tiles together. Note that such "mosaicing" was done only for the training set, and the inference was done independently for each tile in the test set.
+- I also found that there were relatively few flood labels in the dataset and that in some tiles flood pixels are concentrated at the edges of the image. To increase the data, I generated new training samples by joining 4 adjacent tiles together. Note that such "mosaicing" was done only for the training set, and the inference was done independently for each tile in the test set.
 
 ![](figure_02.jpg)
 
@@ -32,7 +32,7 @@
 - When the dataset is relatively small, the random seed used in training can have a significant impact on the validation metric [as pointed out by SpaceNet-6 winner zbigniewwojna](https://github.com/SpaceNetChallenge/SpaceNet_SAR_Buildings_Solutions/blob/master/1-zbigniewwojna/README.md). I used fixed seed for each fold so that I could compare the results more accurately.
 - For both U-Net and Siamese U-Net models, I tried various backbone networks (e.g., EfficientNet, EfficientNetV2, RegNet, etc.) and found EfficientNet was the best. I experimented with EfficientNet-B3 to try various training configurations in a shorter period, and switched to EfficientNet-B5/B6 in the latter half of the competition.
 - For the Siamese U-Net models used for the flood detection, the validation metric varied significantly from epoch to epoch. I found that applying EMA (exponential moving averaging) to the model weights and using larger (7x7) kernel in the penultimate convolution layer could mitigate the instability to some extent. I also tried tuning lr schedule and different optimizers but they did not help.
-- A week before the competition deadline, I noticed that finetuning SpaceNet-5 and xView2 winners' pretrained models significantly improved the scores, so I added these pretrained models to the ensemble.
+- A week before the competition deadline, I noticed that finetuning SpaceNet-5 and xView2 winners' pretrained models significantly improved the score, so I added these pretrained models to the ensemble.
 - To optimize the post-processing, I used the visualization tool provided by the competition organizer. I attempted to improve the baseline post-processing algorithm, but because it was already well tuned, only a few changes were made such as adjusting the detection thresholds.
 
 ## 3. Final Approach
@@ -45,8 +45,8 @@
 
 - Data Cleaning and Pre-processing
   - I excluded some tiles which contain annotation errors from training and validation. See `pre_image_blacklist` field in `configs/defaults/foundation.yaml` and `configs/defaults/flood.yaml` in my solution to know which tiles are removed.
-  - For the tiles with 2 post-event images, the MSE between the pre-event image and each of the post-event images was calculated, and only the post-event image with the smaller MSE was used. This was done to discard the inappropriate post-event images, such as those that were misaligned with the pre-event image, covered by clouds, or almost completely black.
-  - To increase the data, I generated new training samples by joining four adjacent tiles in the same fold together. Note that such "mosaicing" was done only for the training set, and the inference was done independently for each tile in the test set.
+  - For the tiles which have 2 post-event images, the MSE between the pre-event image and each of the post-event images was calculated, and only the post-event image with the smaller MSE was used. This was done to discard the inappropriate post-event images, such as those that were misaligned with the pre-event image, covered by clouds, or almost completely black.
+  - To increase the data, I generated new training samples by joining 4 adjacent tiles in the same fold together. Note that such "mosaicing" was done only for the training set, and the inference was done independently for each tile in the test set.
 - Validation
   - Done by 5-fold cross validation.
   - I found the training tiles could be divided into 4 geographically adjacent groups by using the pre-event image file name prefix (`105001001A0FFC00_0`, `10400100684A4B00_1`, `10300100AF395C00_2`, and `10500500C4DD7000_0`). I split each group into 5 segments by longitude and latitude, and combined 4 segments picked from each group into one fold. For more details, see `tools/make_folds_v3.py` in my solution.
@@ -108,7 +108,7 @@
     - Flooded Road: 0.5 * `Siamese U-Net (EfficientNet-B5)` + 0.5 * `Siamese U-Net (EfficientNet-B6)`
   - As for TTA, only the left-right flipping TTA was applied to the flooded building channel.
   - I trained all the models above with fp16. This reduces the GPU memory usage by 30% compared to fp32 training.
-  - I did not use any external data.
+  - No external data was used.
 
 ## 4. Open Source Resources, Frameworks and Libraries
 
