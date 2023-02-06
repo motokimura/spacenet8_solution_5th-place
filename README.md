@@ -1,5 +1,7 @@
 # motokimura's SpaceNet-8 Solution Description
 
+This README describes my 4th-place solution for [SpaceNet-8: Flood Detection Challenge Using Multiclass Segmentation](https://medium.com/@SpaceNet_Project/announcing-spacenet-8-flood-detection-challenge-using-multiclass-segmentation-49bac6ae300).
+
 ## Overview
 
 > Congrats on achieving a prize winning rank in the SpaceNet-8, Flood Detection Using Multiclass Segmentation challenge.
@@ -11,7 +13,7 @@
 
 - Name: Motoki Kimura
 - Handle: motokimura
-- Placement you achieved:
+- Placement you achieved: 5th place
 - About you: A computer vision research engineer working at a MaaS startup company in Tokyo. I often enjoy data science competitions related with remote sensing imageries and SpaceNet challenges are my most favorite.
 - Why you participated in the challenge: SpaceNet-8 provides two challenging tasks for me: road network extraction and flood detection from pre- and post-event images. I thought I could learn a lot of new techniques (e.g., how to handle pre- and post-event images, how to extract road networks from segmentation results, etc.) through this challenge.
 
